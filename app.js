@@ -11,7 +11,8 @@ app.get('/', function (req, res) {
         password: 'x5RwysYw',
         server: 'assignment3webdev3maor.database.windows.net',
         database: 'Ass3DB3',
-        encrypt: 'true'
+        options: {encrypt: true}
+
     };
 
     // connect to your database
