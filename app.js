@@ -44,3 +44,10 @@ var server = app.listen(5000, function () {
 });
 
 
+function insert() {
+    return "select * from Users";
+}
+
+
+
+
