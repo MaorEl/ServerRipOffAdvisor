@@ -32,6 +32,7 @@ app.get('/', function (req, res) {
                 console.log(err)
 
             // send records as a response
+            var w = recordset;
             res.send(recordset);
 
         });
@@ -41,3 +42,5 @@ app.get('/', function (req, res) {
 var server = app.listen(5000, function () {
     console.log('Server is running..');
 });
+
+
