@@ -151,3 +151,69 @@ exports.insertQuery = function (query,username,password,first_name,last_name,cit
     });
 
 };
+
+
+
+
+
+
+exports.insertAnswer = function (query,username,question,answer) {
+    return new Promise(function (resolve, reject) {
+
+        try {
+
+            var ans = [];
+            var properties = [];
+
+            //acquire a connection
+            pool.acquire(function (err, connection) {
+                if (err) {
+                    console.log('acquire ' + err);
+                    reject(err);
+                }
+                console.log('connection on');
+
+                var dbReq = new Request(query, function (err, rowCount) {
+                    if (err) {
+                        console.log('Request ' + err);
+                        reject(err);
+                    }
+                });
+
+                dbReq.addParameter('username',TYPES.NVarChar,username);
+                dbReq.addParameter('question',TYPES.Int,question);
+                dbReq.addParameter('answer',TYPES.VarChar,answer);
+
+
+
+                dbReq.on('columnMetadata', function (columns) {
+                    columns.forEach(function (column) {
+                        if (column.colName != null)
+                            properties.push(column.colName);
+                    });
+                });
+                dbReq.on('row', function (row) {
+                    var item = {};
+                    for (i = 0; i < row.length; i++) {
+                        item[properties[i]] = row[i].value;
+                    }
+                    ans.push(item);
+                });
+
+                dbReq.on('requestCompleted', function () {
+                    console.log('request Completed: ' + dbReq.rowCount + ' row(s) returned');
+                    console.log(ans);
+                    connection.release();
+                    resolve(ans);
+
+                });
+                connection.execSql(dbReq);
+
+            });
+        }
+        catch (err) {
+            reject(err)
+        }
+    });
+
+};
