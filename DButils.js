@@ -157,7 +157,7 @@ exports.insertQuery = function (query,username,password,first_name,last_name,cit
 
 
 
-exports.insertAnswer = function (query,username,question,answer) {
+exports.InsertAnswer = function (query,username,question,answer) {
     return new Promise(function (resolve, reject) {
 
         try {

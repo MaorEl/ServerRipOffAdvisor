@@ -56,14 +56,14 @@ app.post("/api/new_user", (req , res) => {
 
 
 
-app.post("/api/insert_answer", (req , res) => {
+app.post("/api/InsertAnswer", (req , res) => {
     const user = {
         username: req.body.username,
         question: req.body.question,
         answer: req.body.answer,
     };
     console.log("got this user: " + req.body.username);
-    DButilsAzure.insertAnswer('INSERT INTO UsersAnswers (username,question_id,answer) \n' +
+    DButilsAzure.InsertAnswer('INSERT INTO UsersAnswers (username,question_id,answer) \n' +
         'VALUES (@username,@question,@answer)',
         user.username , user.question , user.answer)
         .then(function(result){
