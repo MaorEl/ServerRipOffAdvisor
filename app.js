@@ -29,7 +29,7 @@ app.get('/get_all_question', function (req, res) {
 
 
 
-app.post("/api/new_user", (req , res) => {
+app.post("/api/register", (req , res) => {
     const user = {
         username: req.body.username,
         first_name: req.body.first_name,
@@ -40,9 +40,9 @@ app.post("/api/new_user", (req , res) => {
         email: req.body.email
     };
     console.log("got this user: " + req.body.first_name);
-    DButilsAzure.insertQuery('INSERT INTO Users (username,password,first_name,last_name,city,country,email,questions_answers) \n' +
-                                    'VALUES (@username,@password,@first_name,@last_name,@city,@country,@email,@questions_answers)',
-                                    user.username , user.password , user.first_name , user.last_name ,user.city , user.country , user.email ,user.questions_answers)
+    DButilsAzure.insertUser('INSERT INTO Users (username,password,first_name,last_name,city,country,email) \n' +
+                                    'VALUES (@username,@password,@first_name,@last_name,@city,@country,@email)',
+                                    user.username , user.password , user.first_name , user.last_name ,user.city , user.country , user.email)
         .then(function(result){
             res.status(201).send(result)
         })
@@ -50,10 +50,25 @@ app.post("/api/new_user", (req , res) => {
             console.log(err);
             res.send(err)
         })
-    //res.status(201).send(username);
 });
 
-
+app.post("/api/login", (req , res) => {
+    const user = {
+        username: req.body.username,
+        password: req.body.password
+    };
+    console.log("find this user: " + req.body.first_name);
+    DButilsAzure.getUser('SELECT * FROM Users \n' +
+        'WHERE [username] LIKE @username AND [password] LIKE @password',
+        user.username , user.password )
+        .then(function(result){
+            res.status(201).send(result)
+        })
+        .catch(function(err){
+            console.log(err);
+            res.send(err)
+        })
+});
 
 
 app.post("/api/insert_answer", (req , res) => {

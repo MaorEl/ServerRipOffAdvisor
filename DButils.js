@@ -1,3 +1,5 @@
+
+
 //this is only an example, handling everything is yours responsibilty !
 //this is an example - open and close the connection in each request
 
@@ -87,7 +89,7 @@ exports.executeQuery = function (query) {
 
 };
 
-exports.insertQuery = function (query,username,password,first_name,last_name,city,country,email,q_a) {
+exports.insertUser = function (query,username,password,first_name,last_name,city,country,email) {
     return new Promise(function (resolve, reject) {
 
         try {
@@ -117,7 +119,6 @@ exports.insertQuery = function (query,username,password,first_name,last_name,cit
                 dbReq.addParameter('city',TYPES.NVarChar,city);
                 dbReq.addParameter('country',TYPES.NVarChar,country);
                 dbReq.addParameter('email',TYPES.NVarChar,email);
-                dbReq.addParameter('questions_answers',TYPES.NVarChar,q_a);
 
 
                 dbReq.on('columnMetadata', function (columns) {
@@ -153,7 +154,58 @@ exports.insertQuery = function (query,username,password,first_name,last_name,cit
 };
 
 
+exports.getUser = function (query,username,password) {
+    return new Promise(function (resolve, reject) {
+        try {
+            var ans = [];
+            var properties = [];
+            //acquire a connection
+            pool.acquire(function (err, connection) {
+                if (err) {
+                    console.log('acquire ' + err);
+                    reject(err);
+                }
+                console.log('connection on');
 
+                var dbReq = new Request(query, function (err, rowCount) {
+                    if (err) {
+                        console.log('Request ' + err);
+                        reject(err);
+                    }
+                });
+
+                dbReq.addParameter('username',TYPES.NVarChar,username);
+                dbReq.addParameter('password',TYPES.NVarChar,password);
+
+                dbReq.on('columnMetadata', function (columns) {
+                    columns.forEach(function (column) {
+                        if (column.colName != null)
+                            properties.push(column.colName);
+                    });
+                });
+                dbReq.on('row', function (row) {
+                    var item = {};
+                    for (i = 0; i < row.length; i++) {
+                        item[properties[i]] = row[i].value;
+                    }
+                    ans.push(item);
+                });
+
+                dbReq.on('requestCompleted', function () {
+                    console.log('request Completed: ' + dbReq.rowCount + ' row(s) returned');
+                    console.log(ans);
+                    connection.release();
+                    resolve(ans);
+
+                });
+                connection.execSql(dbReq);
+            });
+        }
+        catch (err) {
+            reject(err)
+        }
+    });
+};
 
 
 
