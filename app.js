@@ -5,6 +5,20 @@ app.use(express.json()); //hels me read the JSON
 const jwt = require("jsonwebtoken");
 
 secret = "secret";
+app.use("/private", (req, res,next) => {
+    const token = req.header("x-auth-token");
+    console.log("Hi token"); //debug
+    // no token
+    if (!token) res.status(401).send("Access denied. No token provided.");
+    // verify token
+    try {
+        const decoded = jwt.verify(token, secret);
+        req.decoded = decoded;
+        next(); //move on to the actual function
+    } catch (exception) {
+        res.status(400).send("Invalid token.");
+    }
+});
 
 app.get('/categories', function (req, res) {
     DButilsAzure.executeQuery('SELECT * FROM Categories')
@@ -29,7 +43,7 @@ app.get('/all_users', function (req, res) {
 });
 
 //get all question
-app.get('/get_all_question', function (req, res) {
+app.get('/private/get_all_question', function (req, res) {
     DButilsAzure.executeQuery('SELECT * FROM Questions')
         .then(function(result){
             res.send(result)
@@ -114,17 +128,4 @@ var server = app.listen(5000, function () {
 });
 
 
-app.post("/private", (req, res) => {
-    const token = req.header("x-auth-token");
-    // no token
-    if (!token) res.status(401).send("Access denied. No token provided.");
-    // verify token
-    try {
-        const decoded = jwt.verify(token, secret);
-        req.decoded = decoded;
-        res.status(200).send({ result: "Hello " +  req.decoded.username});
-    } catch (exception) {
-        res.status(400).send("Invalid token.");
-    }
-});
 
