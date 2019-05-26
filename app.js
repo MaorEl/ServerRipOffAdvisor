@@ -3,6 +3,16 @@ var app = express();
 const DButilsAzure = require('./DButils');
 app.use(express.json()); //hels me read the JSON
 
+app.get('/categories', function (req, res) {
+    DButilsAzure.executeQuery('SELECT * FROM Categories')
+        .then(function(result){
+            res.send(result)
+        })
+        .catch(function(err){
+            console.log(err)
+            res.send(err)
+        })
+});
 
 app.get('/all_users', function (req, res) {
     DButilsAzure.executeQuery('SELECT * FROM Users')
@@ -29,7 +39,7 @@ app.get('/get_all_question', function (req, res) {
 
 
 
-app.post("/api/register", (req , res) => {
+app.post("/register", (req , res) => {
     const user = {
         username: req.body.username,
         first_name: req.body.first_name,
@@ -52,7 +62,7 @@ app.post("/api/register", (req , res) => {
         })
 });
 
-app.post("/api/login", (req , res) => {
+app.post("/login", (req , res) => {
     const user = {
         username: req.body.username,
         password: req.body.password
@@ -71,7 +81,7 @@ app.post("/api/login", (req , res) => {
 });
 
 
-app.post("/api/InsertAnswer", (req , res) => {
+app.post("/InsertAnswer", (req , res) => {
     const user = {
         username: req.body.username,
         question: req.body.question,
