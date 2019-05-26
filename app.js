@@ -2,16 +2,19 @@ var express = require('express');
 var app = express();
 const DButilsAzure = require('./DButils');
 app.use(express.json()); //hels me read the JSON
+const jwt = require("jsonwebtoken");
+
+secret = "secret";
 
 
 app.get('/all_users', function (req, res) {
     DButilsAzure.executeQuery('SELECT * FROM Users')
         .then(function(result){
-            res.send(result)
+            res.send(result);
         })
         .catch(function(err){
-            console.log(err)
-            res.send(err)
+            console.log(err);
+            res.send(err);
         })
 });
 
@@ -22,7 +25,7 @@ app.get('/get_all_question', function (req, res) {
             res.send(result)
         })
         .catch(function(err){
-            console.log(err)
+            console.log(err);
             res.send(err)
         })
 });
@@ -57,12 +60,15 @@ app.post("/api/login", (req , res) => {
         username: req.body.username,
         password: req.body.password
     };
-    console.log("find this user: " + req.body.first_name);
     DButilsAzure.getUser('SELECT * FROM Users \n' +
         'WHERE [username] LIKE @username AND [password] LIKE @password',
         user.username , user.password )
         .then(function(result){
-            res.status(201).send(result)
+            payload = { username: result[0].username, first_name: result[0].first_name, last_name: result[0].last_name,
+                        city: result[0].city, country: result[0].country, email: result[0].email };
+            options = { expiresIn: "1d" };
+            const token = jwt.sign(payload, secret, options);
+            res.status(201).send(token)
         })
         .catch(function(err){
             console.log(err);
@@ -98,4 +104,17 @@ var server = app.listen(5000, function () {
 });
 
 
+app.post("/private", (req, res) => {
+    const token = req.header("x-auth-token");
+    // no token
+    if (!token) res.status(401).send("Access denied. No token provided.");
+    // verify token
+    try {
+        const decoded = jwt.verify(token, secret);
+        req.decoded = decoded;
+        res.status(200).send({ result: "Hello " +  req.decoded.username});
+    } catch (exception) {
+        res.status(400).send("Invalid token.");
+    }
+});
 
