@@ -69,8 +69,9 @@ app.get('/private/get_all_countries', function (req, res, userId) {
 });
 
 //get 3 random over a specific rank
-app.get('/private/get_3_random', function (req, res, userId) {
-    DButilsAzure.executeQuery('SELECT DISTINCT country FROM Users')
+app.get('/private/get_3_random/:rank', function (req, res, userId) {
+    var float = req.params["rank"];
+    DButilsAzure.executeQuery('SELECT TOP 3 name FROM InterestPoints WHERE rank > '.concat(float).concat('ORDER BY newid()'))
         .then(function(result){
             res.send(result)
         })
