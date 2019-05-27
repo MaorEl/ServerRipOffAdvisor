@@ -15,7 +15,7 @@ app.use("/private", (req, res,next) => {
         const decoded = jwt.verify(token, secret);
         var userId = decoded.username;
         req.username = userId;
-            req.decoded = decoded;
+        req.decoded = decoded;
         next(); //move on to the actual function
     } catch (exception) {
         res.status(400).send("Invalid token.");
@@ -44,8 +44,6 @@ app.get('/all_users', function (req, res) {
         })
 });
 
-
-
 //get all question
 app.get('/private/get_all_question', function (req, res, userId) {
     DButilsAzure.executeQuery('SELECT * FROM Questions')
@@ -58,6 +56,17 @@ app.get('/private/get_all_question', function (req, res, userId) {
         })
 });
 
+//get all countries
+app.get('/private/get_all_countries', function (req, res, userId) {
+    DButilsAzure.executeQuery('SELECT DISTINCT country FROM Users')
+        .then(function(result){
+            res.send(result)
+        })
+        .catch(function(err){
+            console.log(err);
+            res.send(err)
+        })
+});
 
 //get all favorites of username
 app.get('/private/getAllFavorites/:username', function (req, res, userId) {
@@ -82,6 +91,17 @@ app.get('/private/getAllFavorites/:username', function (req, res, userId) {
 });
 
 
+//get 3 random over a specific rank
+app.get('/private/get_3_random', function (req, res, userId) {
+    DButilsAzure.executeQuery('SELECT DISTINCT country FROM Users')
+        .then(function(result){
+            res.send(result)
+        })
+        .catch(function(err){
+            console.log(err);
+            res.send(err)
+        })
+});
 
 
 app.post("/register", (req , res) => {
@@ -239,6 +259,31 @@ app.post('/private/addToFavorites', function (req, res) {
     });
 
 
+
+app.post("/RestorePassword", (req , res) => {
+    const user = {
+        username: req.body.username,
+        question: req.body.question,
+        answer: req.body.answer
+    };
+    console.log("got this user: " + req.body.username);
+    DButilsAzure.executeQuery('SELECT * FROM UsersAnswers WHERE [username] LIKE @username AND [question_id] LIKE @question AND [answer] LIKE @answer ',
+        user.username , user.question , user.answer)
+        .then(function(result){
+            if (result.length === 1){
+                DButilsAzure.executeQuery('SELECT [password] FROM Users WHERE [username] LIKE @usersname',user.username)
+                    .then(function (result) {
+                        res.send(result)
+                    })
+            }
+            //res.send(result)
+        })
+        .catch(function(err){
+            console.log(err);
+            res.send(err)
+        })
+    //res.status(201).send(username);
+});
 
 
 
