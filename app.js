@@ -2,10 +2,28 @@ var express = require('express');
 var app = express();
 const DButilsAzure = require('./DButils');
 app.use(express.json()); //hels me read the JSON
+const jwt = require("jsonwebtoken");
 
+secret = "secret";
+app.use("/private", (req, res,next) => {
+    const token = req.header("x-auth-token");
+    console.log("Hi token"); //debug
+    // no token
+    if (!token) res.status(401).send("Access denied. No token provided.");
+    // verify token
+    try {
+        const decoded = jwt.verify(token, secret);
+        var userId = decoded.username;
+        req.username = userId;
+        req.decoded = decoded;
+        next(); //move on to the actual function
+    } catch (exception) {
+        res.status(400).send("Invalid token.");
+    }
+});
 
-app.get('/all_users', function (req, res) {
-    DButilsAzure.executeQuery('SELECT * FROM Users')
+app.get('/categories', function (req, res) {
+    DButilsAzure.executeQuery('SELECT * FROM Categories')
         .then(function(result){
             res.send(result)
         })
@@ -15,21 +33,55 @@ app.get('/all_users', function (req, res) {
         })
 });
 
+app.get('/all_users', function (req, res) {
+    DButilsAzure.executeQuery('SELECT * FROM Users')
+        .then(function(result){
+            res.send(result);
+        })
+        .catch(function(err){
+            console.log(err);
+            res.send(err);
+        })
+});
+
 //get all question
-app.get('/get_all_question', function (req, res) {
+app.get('/private/get_all_question', function (req, res, userId) {
     DButilsAzure.executeQuery('SELECT * FROM Questions')
         .then(function(result){
             res.send(result)
         })
         .catch(function(err){
-            console.log(err)
+            console.log(err);
+            res.send(err)
+        })
+});
+
+//get all countries
+app.get('/private/get_all_countries', function (req, res, userId) {
+    DButilsAzure.executeQuery('SELECT DISTINCT country FROM Users')
+        .then(function(result){
+            res.send(result)
+        })
+        .catch(function(err){
+            console.log(err);
+            res.send(err)
+        })
+});
+
+//get 3 random over a specific rank
+app.get('/private/get_3_random', function (req, res, userId) {
+    DButilsAzure.executeQuery('SELECT DISTINCT country FROM Users')
+        .then(function(result){
+            res.send(result)
+        })
+        .catch(function(err){
+            console.log(err);
             res.send(err)
         })
 });
 
 
-
-app.post("/api/new_user", (req , res) => {
+app.post("/register", (req , res) => {
     const user = {
         username: req.body.username,
         first_name: req.body.first_name,
@@ -40,9 +92,104 @@ app.post("/api/new_user", (req , res) => {
         email: req.body.email
     };
     console.log("got this user: " + req.body.first_name);
-    DButilsAzure.insertQuery('INSERT INTO Users (username,password,first_name,last_name,city,country,email,questions_answers) \n' +
-                                    'VALUES (@username,@password,@first_name,@last_name,@city,@country,@email,@questions_answers)',
-                                    user.username , user.password , user.first_name , user.last_name ,user.city , user.country , user.email ,user.questions_answers)
+    DButilsAzure.insertUser('INSERT INTO Users (username,password,first_name,last_name,city,country,email) \n' +
+                                    'VALUES (@username,@password,@first_name,@last_name,@city,@country,@email)',
+                                    user.username , user.password , user.first_name , user.last_name ,user.city , user.country , user.email)
+        .then(function(result){
+            res.status(201).send(result)
+        })
+        .catch(function(err){
+            console.log(err);
+            res.send(err)
+        })
+});
+
+app.post("/login", (req , res) => {
+    const user = {
+        username: req.body.username,
+        password: req.body.password
+    };
+    DButilsAzure.getUser('SELECT * FROM Users \n' +
+        'WHERE [username] LIKE @username AND [password] LIKE @password',
+        user.username , user.password )
+        .then(function(result){
+            payload = { username: result[0].username, first_name: result[0].first_name, last_name: result[0].last_name,
+                        city: result[0].city, country: result[0].country, email: result[0].email };
+            options = { expiresIn: "1d" };
+            const token = jwt.sign(payload, secret, options);
+            res.status(201).send(token)
+        })
+        .catch(function(err){
+            console.log(err);
+            res.send(err)
+        })
+});
+
+//get all question
+app.get('/getAllInterestPoints', function (req, res) {
+    DButilsAzure.executeQuery('SELECT * FROM InterestPoints')
+        .then(function(result){
+            res.send(result)
+        })
+        .catch(function(err){
+            console.log(err);
+            res.send(err)
+        })
+});
+
+//get top 5 photos
+app.get('/getTopFivePhotos', function (req, res) {
+    DButilsAzure.executeQuery('SELECT TOP 5 image FROM InterestPoints ORDER BY views DESC')
+        .then(function(result){
+            res.send(result)
+        })
+        .catch(function(err){
+            console.log(err);
+            res.send(err)
+        })
+});
+
+//get interst points by name (search)
+app.get('/searchForInterestPoint/:name', function (req, res) {
+    var string = req.params["name"];
+    var query = 'SELECT id, name, image FROM InterestPoints WHERE name LIKE '.concat("'%", string).concat("%'");
+    DButilsAzure.executeQuery(query)
+        .then(function(result){
+            res.send(result)
+        })
+        .catch(function(err){
+            console.log(err);
+            res.send(err)
+        })
+});
+
+//get all interst points by category (search)
+app.get('/getAllInterestPointsByCategory/:categoryID', function (req, res) {
+    var string = req.params["categoryID"];
+    var query = 'SELECT id, name, image FROM InterestPoints WHERE [category id] = '.concat(string);
+    DButilsAzure.executeQuery(query)
+        .then(function(result){
+            res.send(result)
+        })
+        .catch(function(err){
+            console.log(err);
+            res.send(err)
+        })
+});
+
+
+
+
+app.post("/InsertAnswer", (req , res) => {
+    const user = {
+        username: req.body.username,
+        question: req.body.question,
+        answer: req.body.answer,
+    };
+    console.log("got this user: " + req.body.username);
+    DButilsAzure.InsertAnswer('INSERT INTO UsersAnswers (username,question_id,answer) \n' +
+        'VALUES (@username,@question,@answer)',
+        user.username , user.question , user.answer)
         .then(function(result){
             res.status(201).send(result)
         })
@@ -53,21 +200,40 @@ app.post("/api/new_user", (req , res) => {
     //res.status(201).send(username);
 });
 
+//add interst point to favorites. get param of ip_id
+app.post('/private/addToFavorites', function (req, res) {
+
+    var InterestPointID =  req.query.ip_id;
 
 
+    var query = 'INSERT INTO InterestPointsOfUsers VALUES ('.concat("'",req.username,"' ,",InterestPointID,")");
+    DButilsAzure.executeQuery(query)
+        .then(function(result){
+            res.send(result)
+        })
+        .catch(function(err){
+            console.log(err);
+            res.send(err)
+        })
+});
 
-app.post("/api/insert_answer", (req , res) => {
+app.post("/RestorePassword", (req , res) => {
     const user = {
         username: req.body.username,
         question: req.body.question,
-        answer: req.body.answer,
+        answer: req.body.answer
     };
     console.log("got this user: " + req.body.username);
-    DButilsAzure.insertAnswer('INSERT INTO UsersAnswers (username,question_id,answer) \n' +
-        'VALUES (@username,@question,@answer)',
+    DButilsAzure.executeQuery('SELECT * FROM UsersAnswers WHERE [username] LIKE @username AND [question_id] LIKE @question AND [answer] LIKE @answer ',
         user.username , user.question , user.answer)
         .then(function(result){
-            res.status(201).send(result)
+            if (result.length === 1){
+                DButilsAzure.executeQuery('SELECT [password] FROM Users WHERE [username] LIKE @usersname',user.username)
+                    .then(function (result) {
+                        res.send(result)
+                    })
+            }
+            //res.send(result)
         })
         .catch(function(err){
             console.log(err);
