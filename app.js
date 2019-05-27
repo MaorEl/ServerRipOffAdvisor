@@ -214,6 +214,20 @@ app.get('/getAllInterestPointsByCategory/:categoryID', function (req, res) {
         })
 });
 
+//get one interst point by id (search)
+app.get('/getIntertestPointDetails/:interestPointID', function (req, res) {
+    var string = req.params["interestPointID"];
+    var query = 'SELECT * FROM InterestPoints WHERE [id] = '.concat(string);
+    DButilsAzure.executeQuery(query)
+        .then(function(result){
+            res.send(result)
+        })
+        .catch(function(err){
+            console.log(err);
+            res.send(err)
+        })
+});
+
 
 
 
