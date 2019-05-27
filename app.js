@@ -121,6 +121,31 @@ app.post("/InsertAnswer", (req , res) => {
     //res.status(201).send(username);
 });
 
+app.post("/RestorePassword", (req , res) => {
+    const user = {
+        username: req.body.username,
+        question: req.body.question,
+        answer: req.body.answer
+    };
+    console.log("got this user: " + req.body.username);
+    DButilsAzure.executeQuery('SELECT * FROM UsersAnswers WHERE [username] LIKE @username AND [question_id] LIKE @question AND [answer] LIKE @answer ',
+        user.username , user.question , user.answer)
+        .then(function(result){
+            if (result.length === 1){
+                DButilsAzure.executeQuery('SELECT [password] FROM Users WHERE [username] LIKE @usersname',user.username)
+                    .then(function (result) {
+                        res.send(result)
+                    })
+            }
+            //res.send(result)
+        })
+        .catch(function(err){
+            console.log(err);
+            res.send(err)
+        })
+    //res.status(201).send(username);
+});
+
 
 
 var server = app.listen(5000, function () {
