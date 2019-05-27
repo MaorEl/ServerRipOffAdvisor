@@ -68,6 +68,29 @@ app.get('/private/get_all_countries', function (req, res, userId) {
         })
 });
 
+//get all favorites of username
+app.get('/private/getAllFavorites/:username', function (req, res, userId) {
+    var username = req.params["username"];
+    var token_username = req.username;
+    if (token_username != username) { //checking if the user is the same one
+        console.log(err);
+        res.send(err);
+    }
+    else {
+        var query = 'SELECT id, name, image FROM InterestPoints JOIN InterestPointsOfUsers ON [id] = [interest point id] WHERE username = '.concat("'",username,"'");
+        DButilsAzure.executeQuery(query)
+            .then(function(result){
+                res.send(result)
+            })
+            .catch(function(err){
+                console.log(err);
+                res.send(err)
+            })
+    }
+
+});
+
+
 //get 3 random over a specific rank
 app.get('/private/get_3_random/:rank', function (req, res, userId) {
     var float = req.params["rank"];
@@ -201,6 +224,7 @@ app.post("/InsertAnswer", (req , res) => {
     //res.status(201).send(username);
 });
 
+
 //add interst point to favorites. get param of ip_id
 app.post('/private/addToFavorites', function (req, res) {
 
@@ -217,6 +241,25 @@ app.post('/private/addToFavorites', function (req, res) {
             res.send(err)
         })
 });
+
+//add interst point to favorites. get param of ip_id
+    app.delete('/private/deleteFromFavorites', function (req, res) {
+
+        var InterestPointID =  req.query.ip_id;
+
+        var start_of_query = 'DELETE FROM InterestPointsOfUsers WHERE [username] = ';
+        var query = start_of_query.concat("'",req.username,"' AND [interest point id] = ",InterestPointID,"");
+        DButilsAzure.executeQuery(query)
+            .then(function(result){
+                res.send(result)
+            })
+            .catch(function(err){
+                console.log(err);
+                res.send(err)
+            })
+    });
+
+
 
 app.post("/RestorePassword", (req , res) => {
     const user = {
