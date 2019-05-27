@@ -13,7 +13,9 @@ app.use("/private", (req, res,next) => {
     // verify token
     try {
         const decoded = jwt.verify(token, secret);
-        req.decoded = decoded;
+        var userId = decoded.username;
+        req.username = userId;
+            req.decoded = decoded;
         next(); //move on to the actual function
     } catch (exception) {
         res.status(400).send("Invalid token.");
@@ -42,8 +44,10 @@ app.get('/all_users', function (req, res) {
         })
 });
 
+
+
 //get all question
-app.get('/private/get_all_question', function (req, res) {
+app.get('/private/get_all_question', function (req, res, userId) {
     DButilsAzure.executeQuery('SELECT * FROM Questions')
         .then(function(result){
             res.send(result)
@@ -53,6 +57,8 @@ app.get('/private/get_all_question', function (req, res) {
             res.send(err)
         })
 });
+
+
 
 
 
@@ -100,6 +106,60 @@ app.post("/login", (req , res) => {
         })
 });
 
+//get all question
+app.get('/getAllInterestPoints', function (req, res) {
+    DButilsAzure.executeQuery('SELECT * FROM InterestPoints')
+        .then(function(result){
+            res.send(result)
+        })
+        .catch(function(err){
+            console.log(err);
+            res.send(err)
+        })
+});
+
+//get top 5 photos
+app.get('/getTopFivePhotos', function (req, res) {
+    DButilsAzure.executeQuery('SELECT TOP 5 image FROM InterestPoints ORDER BY views DESC')
+        .then(function(result){
+            res.send(result)
+        })
+        .catch(function(err){
+            console.log(err);
+            res.send(err)
+        })
+});
+
+//get interst points by name (search)
+app.get('/searchForInterestPoint/:name', function (req, res) {
+    var string = req.params["name"];
+    var query = 'SELECT id, name, image FROM InterestPoints WHERE name LIKE '.concat("'%", string).concat("%'");
+    DButilsAzure.executeQuery(query)
+        .then(function(result){
+            res.send(result)
+        })
+        .catch(function(err){
+            console.log(err);
+            res.send(err)
+        })
+});
+
+//get all interst points by category (search)
+app.get('/getAllInterestPointsByCategory/:categoryID', function (req, res) {
+    var string = req.params["categoryID"];
+    var query = 'SELECT id, name, image FROM InterestPoints WHERE [category id] = '.concat(string);
+    DButilsAzure.executeQuery(query)
+        .then(function(result){
+            res.send(result)
+        })
+        .catch(function(err){
+            console.log(err);
+            res.send(err)
+        })
+});
+
+
+
 
 app.post("/InsertAnswer", (req , res) => {
     const user = {
@@ -119,6 +179,23 @@ app.post("/InsertAnswer", (req , res) => {
             res.send(err)
         })
     //res.status(201).send(username);
+});
+
+//add interst point to favorites. get param of ip_id
+app.post('/private/addToFavorites', function (req, res) {
+
+    var InterestPointID =  req.query.ip_id;
+
+
+    var query = 'INSERT INTO InterestPointsOfUsers VALUES ('.concat("'",req.username,"' ,",InterestPointID,")");
+    DButilsAzure.executeQuery(query)
+        .then(function(result){
+            res.send(result)
+        })
+        .catch(function(err){
+            console.log(err);
+            res.send(err)
+        })
 });
 
 
