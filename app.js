@@ -281,11 +281,11 @@ app.post("/RestorePassword", (req , res) => {
         answer: req.body.answer
     };
     console.log("got this user: " + req.body.username);
-    DButilsAzure.executeQuery('SELECT * FROM UsersAnswers WHERE [username] LIKE @username AND [question_id] LIKE @question AND [answer] LIKE @answer ',
-        user.username , user.question , user.answer)
+    DButilsAzure.executeQuery("SELECT * FROM UsersAnswers \n" +
+        "WHERE [username] LIKE '" +user.username + "' AND [question_id] LIKE '" +user.question + "' AND [answer] LIKE '" +user.answer+"'")
         .then(function(result){
             if (result.length === 1){
-                DButilsAzure.executeQuery('SELECT [password] FROM Users WHERE [username] LIKE @usersname',user.username)
+                DButilsAzure.getPassword("SELECT [password] FROM Users WHERE [username] LIKE '" +user.username + "'")
                     .then(function (result) {
                         res.send(result)
                     })
