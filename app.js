@@ -107,9 +107,16 @@ app.get('/private/getThreeRandom/:rank', function (req, res, userId) {
 //get 2 popular interest points of user rank >3.5
 app.get('/private/get_2_popular/:user', function (req, res, userId) {
     var string = req.params["user"];
-    DButilsAzure.executeQuery("SELECT TOP 2 name FROM InterestPoints JOIN InterestPointsOfUsers ON [id] = [interest point id] WHERE InterestPoints.rank>3.5 AND username = ".concat("'",string,"'"))
+    var query = "SELECT name,[category id] FROM InterestPoints JOIN InterestPointsOfUsers ON [id] = [interest point id] WHERE InterestPoints.rank>3.5 AND username = ".concat("'",string,"'");
+    DButilsAzure.executeQuery(query)
         .then(function(result){
-            res.send(result)
+            jsonQueryAnswer = result;
+            var check_query = "SELECT * FROM Reviews WHERE [username] = '".concat(req.username,"' and [interest point id] = ",req.body.interestPointID,") BEGIN ");
+            query = check_query.concat('INSERT INTO Reviews VALUES ('.concat(max,", '",req.username,"' ,'",req.body.description,"',",req.body.rank,",", req.body.interestPointID,')')," END;");
+            DButilsAzure.executeQuery(query)
+                .then(function(result){
+                    res.send(result);
+                });
         })
         .catch(function(err){
             console.log(err);
