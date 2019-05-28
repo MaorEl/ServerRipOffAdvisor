@@ -112,20 +112,26 @@ app.get('/private/get_2_popular/:user', function (req, res, userId) {
         .then(function(result){
             jsonQueryAnswer = result;
             id1 =0;
-            if (jsonQueryAnswer.size>0)
+            if (jsonQueryAnswer!=null)
                 id1 = jsonQueryAnswer[0]["category id"]
             for (var i in jsonQueryAnswer) {
-                if (jsonQueryAnswer[i]["category id"]==id1) {
-                    //        todo remove from list?
+                if (jsonQueryAnswer[i]["category id"]!=id1) {
+                    id2 = jsonQueryAnswer[i]
+                    break;
                 }
             }
-            //todo return top 2 in this sql down here ->
-            var check_query = "SELECT * FROM Reviews WHERE [username] = '".concat(req.username,"' and [interest point id] = ",req.body.interestPointID,") BEGIN ");
-            query = check_query.concat('INSERT INTO Reviews VALUES ('.concat(max,", '",req.username,"' ,'",req.body.description,"',",req.body.rank,",", req.body.interestPointID,')')," END;");
-            DButilsAzure.executeQuery(query)
-                .then(function(result){
-                    res.send(result);
-                });
+            id1 = jsonQueryAnswer[0]
+            const answerF = {
+                id1,id2
+            }
+            res.send(answerF);
+            //todo return top 2 ID1 and ID2->
+            // var check_query = "SELECT * FROM Reviews WHERE [username] = '".concat(req.username,"' and [interest point id] = ",req.body.interestPointID,") BEGIN ");
+            // query = check_query.concat('INSERT INTO Reviews VALUES ('.concat(max,", '",req.username,"' ,'",req.body.description,"',",req.body.rank,",", req.body.interestPointID,')')," END;");
+            // DButilsAzure.executeQuery(query)
+            //     .then(function(result){
+            //         res.send(answerF);
+            //     });
         })
         .catch(function(err){
             console.log(err);
