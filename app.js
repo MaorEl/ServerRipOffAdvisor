@@ -129,9 +129,8 @@ app.post("/register", (req , res) => {
         email: req.body.email
     };
     console.log("got this user: " + req.body.first_name);
-    DButilsAzure.insertUser('INSERT INTO Users (username,password,first_name,last_name,city,country,email) \n' +
-                                    'VALUES (@username,@password,@first_name,@last_name,@city,@country,@email)',
-                                    user.username , user.password , user.first_name , user.last_name ,user.city , user.country , user.email)
+    DButilsAzure.executeQuery("INSERT INTO Users (username,password,first_name,last_name,city,country,email) \n" +
+                                    "VALUES ('"+user.username + "','"+user.password + "','"+user.first_name+ "','"+user.last_name+ "','"+user.city+ "','"+user.country+ "','"+user.email +"')")
         .then(function(result){
             res.status(201).send(result)
         })
@@ -146,9 +145,8 @@ app.post("/login", (req , res) => {
         username: req.body.username,
         password: req.body.password
     };
-    DButilsAzure.getUser('SELECT * FROM Users \n' +
-        'WHERE [username] LIKE @username AND [password] LIKE @password',
-        user.username , user.password )
+    DButilsAzure.executeQuery("SELECT * FROM Users \n" +
+        "WHERE [username] LIKE '" + user.username + "' AND [password] LIKE '" + user.password + "'")
         .then(function(result){
             payload = { username: result[0].username, first_name: result[0].first_name, last_name: result[0].last_name,
                         city: result[0].city, country: result[0].country, email: result[0].email };
@@ -214,6 +212,20 @@ app.get('/getAllInterestPointsByCategory/:categoryID', function (req, res) {
         })
 });
 
+//get one interst point by id (search)
+app.get('/getIntertestPointDetails/:interestPointID', function (req, res) {
+    var string = req.params["interestPointID"];
+    var query = 'SELECT * FROM InterestPoints WHERE [id] = '.concat(string);
+    DButilsAzure.executeQuery(query)
+        .then(function(result){
+            res.send(result)
+        })
+        .catch(function(err){
+            console.log(err);
+            res.send(err)
+        })
+});
+
 
 
 
@@ -224,17 +236,15 @@ app.post("/InsertAnswer", (req , res) => {
         answer: req.body.answer,
     };
     console.log("got this user: " + req.body.username);
-    DButilsAzure.InsertAnswer('INSERT INTO UsersAnswers (username,question_id,answer) \n' +
-        'VALUES (@username,@question,@answer)',
-        user.username , user.question , user.answer)
+    DButilsAzure.executeQuery("INSERT INTO UsersAnswers (username,question_id,answer) VALUES ('"+user.username+"','" +user.question + "','" + user.answer +"')")
         .then(function(result){
+            console.log("got new answer of " + user.username);
             res.status(201).send(result)
         })
         .catch(function(err){
             console.log(err);
             res.send(err)
         })
-    //res.status(201).send(username);
 });
 
 
@@ -281,11 +291,11 @@ app.post("/RestorePassword", (req , res) => {
         answer: req.body.answer
     };
     console.log("got this user: " + req.body.username);
-    DButilsAzure.executeQuery('SELECT * FROM UsersAnswers WHERE [username] LIKE @username AND [question_id] LIKE @question AND [answer] LIKE @answer ',
-        user.username , user.question , user.answer)
+    DButilsAzure.executeQuery("SELECT * FROM UsersAnswers \n" +
+        "WHERE [username] LIKE '" +user.username + "' AND [question_id] LIKE '" +user.question + "' AND [answer] LIKE '" +user.answer+"'")
         .then(function(result){
             if (result.length === 1){
-                DButilsAzure.executeQuery('SELECT [password] FROM Users WHERE [username] LIKE @usersname',user.username)
+                DButilsAzure.getPassword("SELECT [password] FROM Users WHERE [username] LIKE '" +user.username + "'")
                     .then(function (result) {
                         res.send(result)
                     })
