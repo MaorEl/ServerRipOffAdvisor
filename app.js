@@ -58,7 +58,7 @@ app.get('/private/get_all_question', function (req, res, userId) {
 
 //get all countries
 app.get('/private/get_all_countries', function (req, res, userId) {
-    DButilsAzure.executeQuery('SELECT DISTINCT country FROM Users')
+    DButilsAzure.executeQuery('SELECT DISTINCT name FROM Country')
         .then(function(result){
             res.send(result)
         })
@@ -104,10 +104,10 @@ app.get('/private/get_3_random/:rank', function (req, res, userId) {
         })
 });
 
-//get 2 popular interest points of user
+//get 2 popular interest points of user rank >3.5
 app.get('/private/get_2_popular/:user', function (req, res, userId) {
     var string = req.params["user"];
-    DButilsAzure.executeQuery("SELECT TOP 2 name FROM InterestPoints JOIN InterestPointsOfUsers ON [id] = [interest point id] WHERE username = ".concat("'",string,"'"))
+    DButilsAzure.executeQuery("SELECT TOP 2 name FROM InterestPoints JOIN InterestPointsOfUsers ON [id] = [interest point id] WHERE InterestPoints.rank>3.5 AND username = ".concat("'",string,"'"))
         .then(function(result){
             res.send(result)
         })
