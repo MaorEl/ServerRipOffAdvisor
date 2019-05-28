@@ -69,7 +69,7 @@ app.get('/private/getAllCountries', function (req, res, userId) {
 });
 
 //get all favorites of username
-app.get('/private/getAllFavorites/:username', function (req, res, userId) {
+app.get('/private/getAllFavorites/:username', function (req, res) {
     var username = req.params["username"];
     var token_username = req.username;
     if (token_username != username) { //checking if the user is the same one
@@ -77,7 +77,7 @@ app.get('/private/getAllFavorites/:username', function (req, res, userId) {
         res.send(err);
     }
     else {
-        var query = 'SELECT id, name, image FROM InterestPoints JOIN InterestPointsOfUsers ON [id] = [interest point id] WHERE username = '.concat("'",username,"'");
+        var query = 'SELECT id, name, image FROM InterestPoints JOIN InterestPointsOfUsers ON [id] = [interest point id] WHERE username = '.concat("'",username,"' ORDER BY i DESC");
         DButilsAzure.executeQuery(query)
             .then(function(result){
                 res.send(result)
@@ -263,22 +263,59 @@ app.post("/InsertAnswer", (req , res) => {
         })
 });
 
+//set interst point index to sort it
+//will get JSON of JSONS({"interestPointID", "i"})
+
+app.put('/private/updateSortOption/', function (req, res) {
+    var ip_id, i;
+    var username =  req.username;
+    for (var key in req.body) {
+        ip_id = req.body[key]["interestPointID"];
+        i = req.body[key]['i'];
+        var query = 'UPDATE InterestPointsOfUsers SET i = '.concat(i, " WHERE [username] = '",username,"' AND [interest point id] = ",ip_id);
+        DButilsAzure.executeQuery(query)
+            .then(function(result){
+                res.send(result)
+            })
+            .catch(function(err){
+                console.log("failed to update in updateSortOption");
+                console.log(err);
+                res.send(err)
+            })
+    }
+
+});
+
 
 //add interst point to favorites. get param of ip_id
 app.post('/private/addToFavorites', function (req, res) {
 
     var InterestPointID =  req.query.ip_id;
+    var i = 1;
+
+    var query = "SELECT i FROM InterestPointsOfUsers WHERE i=(SELECT max(i) FROM InterestPointsOfUsers WHERE [username] = '".concat(req.username,"') " +
+        "AND [username] = '",req.username,"'");
+    DButilsAzure.executeQuery(query).then(function(result) {
+        var x = result;
+        for (var key in result[0]) {
+            i = result[0][key] +1;
+        }
+
+        var query = 'INSERT INTO InterestPointsOfUsers VALUES ('.concat("'",req.username,"' ,",InterestPointID,",",i,")");
+        DButilsAzure.executeQuery(query)
+            .then(function(result){
+                res.send(result)
+            })
+            .catch(function(err){
+                console.log(err);
+                res.send(err)
+            })
+    }).catch(function(err){
+        console.log(err);
+        res.send(err)
+    })
 
 
-    var query = 'INSERT INTO InterestPointsOfUsers VALUES ('.concat("'",req.username,"' ,",InterestPointID,")");
-    DButilsAzure.executeQuery(query)
-        .then(function(result){
-            res.send(result)
-        })
-        .catch(function(err){
-            console.log(err);
-            res.send(err)
-        })
 });
 
 //rank interest point by user
@@ -306,7 +343,8 @@ app.post('/private/rankInterestPoint', function (req, res) {
                         .then(function(result){
                             for (var key in result[0]) {
                                 count = result[0][key];
-                            }                            var sum_query = 'SELECT SUM(rating) FROM Reviews WHERE [interest point id] = '.concat("'",req.body.interestPointID,"'");
+                            }
+                            var sum_query = 'SELECT SUM(rating) FROM Reviews WHERE [interest point id] = '.concat("'",req.body.interestPointID,"'");
                             DButilsAzure.executeQuery(sum_query)
                                 .then(function(result){
                                     for (var key in result[0]) {
