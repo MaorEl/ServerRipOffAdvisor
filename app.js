@@ -241,6 +241,80 @@ app.post('/private/addToFavorites', function (req, res) {
         })
 });
 
+//rank interest point by user
+app.post('/private/rankInterestPoint', function (req, res) {
+
+    var max = 1;
+    var query = 'SELECT id FROM Reviews WHERE id=(SELECT max(id) FROM Reviews)';
+    var max_result = null;
+    DButilsAzure.executeQuery(query)
+        .then(function(result){
+            max_result = result;
+            max = max_result[0].id + 1;
+            var check_query = "IF NOT EXISTS (SELECT * FROM Reviews WHERE [username] = '".concat(req.username,"' and [interest point id] = ",req.body.interestPointID,") BEGIN ");
+            query = check_query.concat('INSERT INTO Reviews VALUES ('.concat(max,", '",req.username,"' ,'",req.body.description,"',",req.body.rank,",", req.body.interestPointID,')')," END;");
+            DButilsAzure.executeQuery(query)
+                .then(function(result){
+                    res.send(result);
+
+                    var sum = 0;
+                    var count = 0;
+
+
+                    var count_query = 'SELECT COUNT(*) FROM Reviews WHERE [interest point id] = '.concat("'",req.body.interestPointID,"'");
+                    DButilsAzure.executeQuery(count_query)
+                        .then(function(result){
+                            for (var key in result[0]) {
+                                count = result[0][key];
+                            }                            var sum_query = 'SELECT SUM(rating) FROM Reviews WHERE [interest point id] = '.concat("'",req.body.interestPointID,"'");
+                            DButilsAzure.executeQuery(sum_query)
+                                .then(function(result){
+                                    for (var key in result[0]) {
+                                        sum = result[0][key];
+                                    }                                    var new_rank = sum / count;
+                                    var update_rating_query = 'UPDATE InterestPoints SET rank = '.concat(new_rank," WHERE id = ",req.body.interestPointID);
+                                    DButilsAzure.executeQuery(update_rating_query)
+                                        .then(function(result){
+                                        })
+                                        .catch(function(err){
+                                            console.log("line 305");
+                                            console.log(err);
+                                            res.send(err)
+                                        })
+                                })
+                                .catch(function(err){
+                                    console.log("line 292");
+
+                                    console.log(err);
+
+                                    res.send(err)
+                                });
+
+                        })
+                        .catch(function(err){
+                            console.log("line 281");
+                            console.log(err);
+                            res.send(err)
+                        });
+
+                })
+                .catch(function(err){
+                    console.log("line 267");
+                    console.log(err);
+                    res.send(err)
+                });
+
+        })
+        .catch(function(err){
+            console.log(err);
+            res.send(err)
+        });
+
+
+
+
+});
+
 //add interst point to favorites. get param of ip_id
     app.delete('/private/deleteFromFavorites', function (req, res) {
 
