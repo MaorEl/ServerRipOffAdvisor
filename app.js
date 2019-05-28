@@ -369,7 +369,7 @@ app.post("/RestorePassword", (req , res) => {
         "WHERE [username] LIKE '" +user.username + "' AND [question_id] LIKE '" +user.question + "' AND [answer] LIKE '" +user.answer+"'")
         .then(function(result){
             if (result.length === 1){
-                DButilsAzure.getPassword("SELECT [password] FROM Users WHERE [username] LIKE '" +user.username + "'")
+                DButilsAzure.executeQuery("SELECT [password] FROM Users WHERE [username] LIKE '" +user.username + "'")
                     .then(function (result) {
                         res.send(result)
                     })
