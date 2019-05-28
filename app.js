@@ -22,7 +22,7 @@ app.use("/private", (req, res,next) => {
     }
 });
 
-app.get('/categories', function (req, res) {
+app.get('/getAllCategories', function (req, res) {
     DButilsAzure.executeQuery('SELECT * FROM Categories')
         .then(function(result){
             res.send(result)
@@ -45,7 +45,7 @@ app.get('/all_users', function (req, res) {
 });
 
 //get all question
-app.get('/private/get_all_question', function (req, res, userId) {
+app.get('/private/getAllQuestions', function (req, res, userId) {
     DButilsAzure.executeQuery('SELECT * FROM Questions')
         .then(function(result){
             res.send(result)
@@ -57,7 +57,7 @@ app.get('/private/get_all_question', function (req, res, userId) {
 });
 
 //get all countries
-app.get('/private/get_all_countries', function (req, res, userId) {
+app.get('/private/getAllCountries', function (req, res, userId) {
     DButilsAzure.executeQuery('SELECT DISTINCT name FROM Country')
         .then(function(result){
             res.send(result)
@@ -92,7 +92,7 @@ app.get('/private/getAllFavorites/:username', function (req, res, userId) {
 
 
 //get 3 random over a specific rank
-app.get('/private/get_3_random/:rank', function (req, res, userId) {
+app.get('/private/getThreeRandom/:rank', function (req, res, userId) {
     var float = req.params["rank"];
     DButilsAzure.executeQuery('SELECT TOP 3 name FROM InterestPoints WHERE rank > '.concat(float).concat('ORDER BY newid()'))
         .then(function(result){
