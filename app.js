@@ -133,6 +133,24 @@ app.get('/private/get_2_popular/:user', function (req, res, userId) {
 });
 
 
+
+
+//get last 2 intreset points
+app.get('/private/get_2_last/:user', function (req, res, userId) {
+    var string = req.params["user"];
+    var query = "SELECT TOP 2 name,[category id], InterestPointsOfUsers.i FROM InterestPoints JOIN InterestPointsOfUsers ON [id] = [interest point id] WHERE username = ".concat("'",string,"'".concat("ORDER BY i DESC"));
+    DButilsAzure.executeQuery(query)
+        .then(function(result){
+            res.send(result);
+        })
+        .catch(function(err){
+            console.log(err);
+            res.send(err)
+        })
+});
+
+
+
 app.post("/register", (req , res) => {
     const user = {
         username: req.body.username,
