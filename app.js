@@ -161,6 +161,19 @@ app.post("/register", (req , res) => {
         country: req.body.country,
         email: req.body.email
     };
+
+    // itzik edit - check me
+    if (user.username.length<3 || user.username.length>8)
+        throw "problem with username length!";
+    if (user.password.length<5 || user.password.length>10)
+        throw "problem with password length!";
+    var letters = /^[A-Za-z]+$/;
+    if(!username.value.match(letters))
+        throw "problem with username, only letters allowed!";
+    letters = /^[A-Za-z0-9]+$/;
+    if(!password.value.match(letters))
+        throw "problem with password, only letters allowed!";
+
     console.log("got this user: " + req.body.first_name);
     DButilsAzure.executeQuery("INSERT INTO Users (username,password,first_name,last_name,city,country,email) \n" +
                                     "VALUES ('"+user.username + "','"+user.password + "','"+user.first_name+ "','"+user.last_name+ "','"+user.city+ "','"+user.country+ "','"+user.email +"')")
