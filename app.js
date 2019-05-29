@@ -125,13 +125,6 @@ app.get('/private/get_2_popular/:user', function (req, res, userId) {
                 id1,id2
             }
             res.send(answerF);
-            //todo return top 2 ID1 and ID2->
-            // var check_query = "SELECT * FROM Reviews WHERE [username] = '".concat(req.username,"' and [interest point id] = ",req.body.interestPointID,") BEGIN ");
-            // query = check_query.concat('INSERT INTO Reviews VALUES ('.concat(max,", '",req.username,"' ,'",req.body.description,"',",req.body.rank,",", req.body.interestPointID,')')," END;");
-            // DButilsAzure.executeQuery(query)
-            //     .then(function(result){
-            //         res.send(answerF);
-            //     });
         })
         .catch(function(err){
             console.log(err);
