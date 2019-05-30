@@ -20,7 +20,7 @@ app.get('/private/getAllQuestions',function(req,res) {
 
 //get all countries
 app.get('/private/getAllCountries', function(req, res) {
-    user.getAllCountries(res,res);
+    user.getAllCountries(req,res);
 });
 
 //get all favorites of username
