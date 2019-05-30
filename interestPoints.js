@@ -86,6 +86,21 @@ function getIntertestPointDetails(req, res) {
         })
 }
 
+function  viewInterestPoint(req, res) {
+    var ip_id = req.params["InterestPointID"];
+    var query = "UPDATE [dbo].[InterestPoints] \n" +
+        "SET [views] = ((SELECT [views] FROM [dbo].[InterestPoints] WHERE [id] = " +ip_id +")) + 1 \n" +
+        "WHERE [id] = " +ip_id ;
+    DButilsAzure.executeQuery(query)
+        .then(function(result){
+            res.send(result)
+        })
+        .catch(function(err){
+            console.log(err);
+            res.send(err)
+        })
+}
+
 function addToFavorites (req, res) {
 
     var InterestPointID =  req.query.ip_id;
@@ -307,3 +322,4 @@ function getTopFivePhotos (req, res) {
     exports.getThreeRandom = getThreeRandom;
     exports.searchForInterestPoint  = searchForInterestPoint;
     exports.getTopFivePhotos = getTopFivePhotos;
+    exports.viewInterestPoint = viewInterestPoint;
