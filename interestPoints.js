@@ -317,7 +317,7 @@ function getTopFivePhotos (req, res) {
     exports.rankInterestPoint = rankInterestPoint;
     exports.deleteFromFavorites = deleteFromFavorites;
     exports.updateSortOption = updateSortOption;
-    exports.getAllCategories = getAllInterestPointsByCategory;
+    exports.getAllCategories = getAllCategories();
     exports.getAllFavorites = getAllFavorites;
     exports.getThreeRandom = getThreeRandom;
     exports.searchForInterestPoint  = searchForInterestPoint;
