@@ -28,6 +28,21 @@ app.get('/private/getThreeRandom/:rank',ip.getThreeRandom);
 //get last two reviews of interest point
 app.get('/getLastTwoReviews/:InterestPointID', ip.getLastTwoReviews);
 
+app.put('/viewInterestPoint/:InterestPointID', function (req, res) {
+    var ip_id = req.params["InterestPointID"];
+    var query = "UPDATE [dbo].[InterestPoints] \n" +
+                "SET [views] = ((SELECT [views] FROM [dbo].[InterestPoints] WHERE [id] = " +ip_id +")) + 1 \n" +
+                "WHERE [id] = " +ip_id ;
+    DButilsAzure.executeQuery(query)
+        .then(function(result){
+            res.send(result)
+        })
+        .catch(function(err){
+            console.log(err);
+            res.send(err)
+        })
+});
+
 //get 2 popular interest points of user
 app.get('/private/getTwoPopularInterestPoints', ip.getTwoPopularInterestPoints);
 
