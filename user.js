@@ -1,4 +1,9 @@
 const DButilsAzure = require('./DButils');
+const jwt = require("jsonwebtoken");
+
+
+secret = "secret";
+
 
 function register(req,res) {
 
