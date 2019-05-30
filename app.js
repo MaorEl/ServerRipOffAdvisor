@@ -367,7 +367,7 @@ app.post('/private/addToFavorites', function (req, res) {
             i = result[0][key] +1;
         }
 
-        var query = 'INSERT INTO InterestPointsOfUsers VALUES ('.concat("'",req.username,"' ,",InterestPointID,",",i,")");
+        var query = 'INSERT INTO InterestPointsOfUsers (username, [interest point id, i) VALUES ('.concat("'",req.username,"' ,",InterestPointID,",",i,")");
         DButilsAzure.executeQuery(query)
             .then(function(result){
                 res.send(result)
