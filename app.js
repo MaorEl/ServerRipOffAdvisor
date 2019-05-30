@@ -85,6 +85,20 @@ app.get('/private/getThreeRandom/:rank', function (req, res) {
         })
 });
 
+//get last two reviews of interest point
+app.get('/getLastTwoReviews/:InterestPointID', function (req, res) {
+    var ip_id = req.params["InterestPointID"];
+    var query = 'SELECT TOP 2 id, username, review, addedOn FROM Reviews WHERE [interest point id] = '.concat(ip_id, " ORDER BY addedOn DESC");
+    DButilsAzure.executeQuery(query)
+        .then(function(result){
+            res.send(result)
+        })
+        .catch(function(err){
+            console.log(err);
+            res.send(err)
+        })
+});
+
 //get 2 popular interest points of user
 app.get('/private/getTwoPopularInterestPoints', function (req, res) {
     //var query = "SELECT I.* FROM InterestPoints I JOIN InterestPointsOfUsers U ON [id] = [interest point id] WHERE InterestPoints.rank>3.5 AND username = ".concat("'",req.username,"'");
