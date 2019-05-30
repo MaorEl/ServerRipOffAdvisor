@@ -99,7 +99,6 @@ app.get('/getLastTwoReviews/:InterestPointID', function (req, res) {
         })
 });
 
-//get last two reviews of interest point
 app.put('/viewInterestPoint/:InterestPointID', function (req, res) {
     var ip_id = req.params["InterestPointID"];
     var query = "UPDATE [dbo].[InterestPoints] \n" +
