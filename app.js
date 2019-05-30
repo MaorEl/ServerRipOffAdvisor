@@ -7,7 +7,6 @@ const jwt = require("jsonwebtoken");
 secret = "secret";
 app.use("/private", (req, res,next) => {
     const token = req.header("x-auth-token");
-    console.log("Hi token"); //debug
     // no token
     if (!token) res.status(401).send("Access denied. No token provided.");
     // verify token
@@ -33,19 +32,9 @@ app.get('/getAllCategories', function (req, res) {
         })
 });
 
-app.get('/all_users', function (req, res) {
-    DButilsAzure.executeQuery('SELECT * FROM Users')
-        .then(function(result){
-            res.send(result);
-        })
-        .catch(function(err){
-            console.log(err);
-            res.send(err);
-        })
-});
 
 //get all question
-app.get('/private/getAllQuestions', function (req, res, userId) {
+app.get('/private/getAllQuestions', function (req, res) {
     DButilsAzure.executeQuery('SELECT * FROM Questions')
         .then(function(result){
             res.send(result)
@@ -57,7 +46,7 @@ app.get('/private/getAllQuestions', function (req, res, userId) {
 });
 
 //get all countries
-app.get('/private/getAllCountries', function (req, res, userId) {
+app.get('/private/getAllCountries', function (req, res) {
     DButilsAzure.executeQuery('SELECT DISTINCT name FROM Country')
         .then(function(result){
             res.send(result)
@@ -69,47 +58,24 @@ app.get('/private/getAllCountries', function (req, res, userId) {
 });
 
 //get all favorites of username
-app.get('/private/getAllFavorites/:username', function (req, res) {
-    var username = req.params["username"];
+app.get('/private/getAllFavorites', function (req, res) {
     var token_username = req.username;
-    if (token_username != username) { //checking if the user is the same one
-        console.log(err);
-        res.send(err);
-    }
-    else {
-        var query = 'SELECT id, name, image FROM InterestPoints JOIN InterestPointsOfUsers ON [id] = [interest point id] WHERE username = '.concat("'",username,"' ORDER BY i DESC");
-        DButilsAzure.executeQuery(query)
-            .then(function(result){
-                res.send(result)
-            })
-            .catch(function(err){
-                console.log(err);
-                res.send(err)
-            })
-    }
-
-});
-//get last two saved ip of username by token
-app.get('/private/getLastTwoInterestPoint', function (req, res) {
-    var token_username = req.username;
-    var query = 'SELECT TOP 2 id, name, image FROM InterestPoints JOIN InterestPointsOfUsers ON [id] = [interest point id] WHERE username = '.concat("'",token_username,"' ORDER BY addedOn DESC");
-        DButilsAzure.executeQuery(query)
-            .then(function(result){
-                res.send(result)
-            })
-            .catch(function(err){
-                console.log(err);
-                res.send(err)
-            })
-
-
+    var query = 'SELECT * FROM InterestPoints JOIN InterestPointsOfUsers ON [id] = [interest point id] WHERE username = '.concat("'", token_username, "' ORDER BY i DESC");
+    DButilsAzure.executeQuery(query)
+        .then(function (result) {
+            res.send(result)
+        })
+        .catch(function (err) {
+            console.log(err);
+            res.send(err)
+        })
 });
 
 
 //get 3 random over a specific rank
 app.get('/private/getThreeRandom/:rank', function (req, res) {
     var float = req.params["rank"];
-    DButilsAzure.executeQuery('SELECT TOP 3 name FROM InterestPoints WHERE rank > '.concat(float).concat('ORDER BY newid()'))
+    DButilsAzure.executeQuery('SELECT TOP 3 * FROM InterestPoints WHERE rank >= '.concat(float).concat('ORDER BY newid()'))
         .then(function(result){
             res.send(result)
         })
@@ -133,27 +99,18 @@ app.get('/getLastTwoReviews/:InterestPointID', function (req, res) {
         })
 });
 
-//get 2 popular interest points of user rank >3.5
-app.get('/private/get_2_popular/:user', function (req, res, userId) {
-    var string = req.params["user"];
-    var query = "SELECT name,[category id] FROM InterestPoints JOIN InterestPointsOfUsers ON [id] = [interest point id] WHERE InterestPoints.rank>3.5 AND username = ".concat("'",string,"'");
+//get 2 popular interest points of user
+app.get('/private/getTwoPopularInterestPoints', function (req, res) {
+    //var query = "SELECT I.* FROM InterestPoints I JOIN InterestPointsOfUsers U ON [id] = [interest point id] WHERE InterestPoints.rank>3.5 AND username = ".concat("'",req.username,"'");
+    let query = "SELECT TOP 2 I.* \n" +
+                "FROM [dbo].[InterestPoints] I INNER JOIN [dbo].[CategoriesOfUsers] U \n" +
+                "ON I.[category id] = U.[category_id] \n" +
+                "WHERE U.[username] LIKE '" + req.username + "' \n" +
+                "ORDER BY I.[rank] DESC";
     DButilsAzure.executeQuery(query)
         .then(function(result){
-            jsonQueryAnswer = result;
-            id1 =0;
-            if (jsonQueryAnswer!=null)
-                id1 = jsonQueryAnswer[0]["category id"]
-            for (var i in jsonQueryAnswer) {
-                if (jsonQueryAnswer[i]["category id"]!=id1) {
-                    id2 = jsonQueryAnswer[i]
-                    break;
-                }
-            }
-            id1 = jsonQueryAnswer[0]
-            const answerF = {
-                id1,id2
-            }
-            res.send(answerF);
+            console.log("return 2 popular interest points by user preferences");
+            res.send(result);
         })
         .catch(function(err){
             console.log(err);
@@ -164,10 +121,15 @@ app.get('/private/get_2_popular/:user', function (req, res, userId) {
 
 
 
-//get last 2 intreset points
-app.get('/private/get_2_last/:user', function (req, res, userId) {
-    var string = req.params["user"];
-    var query = "SELECT TOP 2 name,[category id], InterestPointsOfUsers.i FROM InterestPoints JOIN InterestPointsOfUsers ON [id] = [interest point id] WHERE username = ".concat("'",string,"'".concat("ORDER BY i DESC"));
+//get last 2 interest points
+app.get('/private/getLastTwoSavedInterestPoints', function (req, res) {
+    //var query = "SELECT TOP 2 name,[category id], InterestPointsOfUsers.i FROM InterestPoints JOIN InterestPointsOfUsers ON [id] = [interest point id] WHERE username = ".concat("'",req.username,"'".concat("ORDER BY i DESC"));
+    let query = "SELECT TOP 2 I.* \n" +
+                "FROM [dbo].[InterestPoints] I INNER JOIN [dbo].[InterestPointsOfUsers] U \n" +
+                "ON I.[id] = U.[interest point id] \n" +
+                "WHERE U.[username] LIKE '" + req.username + "' \n" +
+                "ORDER BY U.[addedOn] DESC";
+
     DButilsAzure.executeQuery(query)
         .then(function(result){
             res.send(result);
@@ -188,32 +150,53 @@ app.post("/register", (req , res) => {
         password: req.body.password,
         city: req.body.city,
         country: req.body.country,
-        email: req.body.email
+        email: req.body.email,
+        categories: req.body.categories
     };
 
-    // itzik edit - check me
     if (user.username.length<3 || user.username.length>8) {
-        res.status(400).send('problem with username length!');
+        res.status(400).send('Problem with username length!');
     }
     if (user.password.length<5 || user.password.length>10){
         res.statusCode = 400;
-        res.send("problem with password length!");
+        res.send("Problem with password length!");
     }
-    var letters = /^[A-Za-z]+$/;
-    if(!username.value.match(letters)) {
+    if(!(/^[a-zA-Z]+$/.test(user.username))) {
         res.statusCode = 400;
-        res.send("problem with username, only letters allowed!");
+        res.send("Problem with username, only letters allowed!");
     }
-    letters = /^[A-Za-z0-9]+$/;
-    if(!password.value.match(letters)) {
+    if(!(user.password.match("^[A-z0-9]+$"))) {
         res.statusCode = 400;
-        res.send("problem with password, only letters allowed!");
+        res.send("Problem with password, only letters and digits are allowed!");
     }
+    var categoriesArray = user.categories.split(',');
+    if (categoriesArray.length < 2){
+        res.statusCode = 400;
+        res.send("Not enough categories specified !");
+    }
+    var categoriesIntList = [];
+    categoriesArray.forEach(function(value){
+        if (!isNaN(parseInt (value)))
+            categoriesIntList.push(parseInt (value));
+        else {
+            res.statusCode = 400;
+            res.send("Category must be ID !");
+        }
+    });
 
     console.log("got this user: " + req.body.first_name);
     DButilsAzure.executeQuery("INSERT INTO Users (username,password,first_name,last_name,city,country,email) \n" +
                                     "VALUES ('"+user.username + "','"+user.password + "','"+user.first_name+ "','"+user.last_name+ "','"+user.city+ "','"+user.country+ "','"+user.email +"')")
         .then(function(result){
+            categoriesIntList.forEach(function (category) {
+                DButilsAzure.executeQuery("INSERT INTO [CategoriesOfUsers] (username, category_id) \n" +
+                    "VALUES ('" + user.username + "','" + category +"')")
+                    .catch(function(err){
+                        console.log(err);
+                        res.send(err)
+                    })
+            });
+
             res.status(201).send(result)
         })
         .catch(function(err){
@@ -269,7 +252,7 @@ app.get('/getTopFivePhotos', function (req, res) {
 //get interst points by name (search)
 app.get('/searchForInterestPoint/:name', function (req, res) {
     var string = req.params["name"];
-    var query = 'SELECT id, name, image FROM InterestPoints WHERE name LIKE '.concat("'%", string).concat("%'");
+    var query = 'SELECT * FROM InterestPoints WHERE name LIKE '.concat("'%", string).concat("%'");
     DButilsAzure.executeQuery(query)
         .then(function(result){
             res.send(result)
@@ -283,7 +266,7 @@ app.get('/searchForInterestPoint/:name', function (req, res) {
 //get all interst points by category (search)
 app.get('/getAllInterestPointsByCategory/:categoryID', function (req, res) {
     var string = req.params["categoryID"];
-    var query = 'SELECT id, name, image FROM InterestPoints WHERE [category id] = '.concat(string);
+    var query = 'SELECT * FROM InterestPoints WHERE [category id] = '.concat(string);
     DButilsAzure.executeQuery(query)
         .then(function(result){
             res.send(result)
@@ -332,7 +315,7 @@ app.post("/InsertAnswer", (req , res) => {
 //set interst point index to sort it
 //will get JSON of JSONS({"interestPointID", "i"})
 
-app.put('/private/updateSortOption/', function (req, res) {
+app.put('/private/updateSortOption', function (req, res) {
     var ip_id, i;
     var username =  req.username;
     for (var key in req.body) {
@@ -353,7 +336,7 @@ app.put('/private/updateSortOption/', function (req, res) {
 });
 
 
-//add interst point to favorites. get param of ip_id
+//add interest point to favorites. get param of ip_id
 app.post('/private/addToFavorites', function (req, res) {
 
     var InterestPointID =  req.query.ip_id;
@@ -367,7 +350,8 @@ app.post('/private/addToFavorites', function (req, res) {
             i = result[0][key] +1;
         }
 
-        var query = 'INSERT INTO InterestPointsOfUsers (username, [interest point id, i) VALUES ('.concat("'",req.username,"' ,",InterestPointID,",",i,")");
+        //var query = 'INSERT INTO InterestPointsOfUsers VALUES ('.concat("'",req.username,"' ,",InterestPointID,",",i,")");
+        var query = 'INSERT INTO InterestPointsOfUsers (username, [interest point id], i) VALUES ('.concat("'",req.username,"' ,",InterestPointID,",",i,")");
         DButilsAzure.executeQuery(query)
             .then(function(result){
                 res.send(result)
@@ -395,7 +379,7 @@ app.post('/private/rankInterestPoint', function (req, res) {
             max_result = result;
             max = max_result[0].id + 1;
             var check_query = "IF NOT EXISTS (SELECT * FROM Reviews WHERE [username] = '".concat(req.username,"' and [interest point id] = ",req.body.interestPointID,") BEGIN ");
-            query = check_query.concat('INSERT INTO Reviews VALUES ('.concat(max,", '",req.username,"' ,'",req.body.description,"',",req.body.rank,",", req.body.interestPointID,')')," END;");
+            query = check_query.concat('INSERT INTO Reviews (id, username, review, [interest point id]) VALUES ('.concat(max,", '",req.username,"' ,'",req.body.description,"',",req.body.rank,",", req.body.interestPointID,')')," END;");
             DButilsAzure.executeQuery(query)
                 .then(function(result){
                     res.send(result);
@@ -460,21 +444,21 @@ app.post('/private/rankInterestPoint', function (req, res) {
 });
 
 //add interst point to favorites. get param of ip_id
-    app.delete('/private/deleteFromFavorites', function (req, res) {
+app.delete('/private/deleteFromFavorites', function (req, res) {
 
-        var InterestPointID =  req.query.ip_id;
+    var InterestPointID = req.query.ip_id;
 
-        var start_of_query = 'DELETE FROM InterestPointsOfUsers WHERE [username] = ';
-        var query = start_of_query.concat("'",req.username,"' AND [interest point id] = ",InterestPointID,"");
-        DButilsAzure.executeQuery(query)
-            .then(function(result){
-                res.send(result)
-            })
-            .catch(function(err){
-                console.log(err);
-                res.send(err)
-            })
-    });
+    var start_of_query = 'DELETE FROM InterestPointsOfUsers WHERE [username] = ';
+    var query = start_of_query.concat("'", req.username, "' AND [interest point id] = ", InterestPointID, "");
+    DButilsAzure.executeQuery(query)
+        .then(function (result) {
+            res.send(result)
+        })
+        .catch(function (err) {
+            console.log(err);
+            res.send(err)
+        })
+});
 
 
 
