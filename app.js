@@ -88,7 +88,7 @@ app.get('/private/getThreeRandom/:rank', function (req, res) {
 //get last two reviews of interest point
 app.get('/getLastTwoReviews/:InterestPointID', function (req, res) {
     var ip_id = req.params["InterestPointID"];
-    var query = 'SELECT TOP 2 id, username, review, addedOn FROM Reviews WHERE [interest point id] = '.concat(ip_id, " ORDER BY addedOn DESC");
+    var query = 'SELECT TOP 2 * FROM Reviews WHERE [interest point id] = '.concat(ip_id, " ORDER BY addedOn DESC");
     DButilsAzure.executeQuery(query)
         .then(function(result){
             res.send(result)
