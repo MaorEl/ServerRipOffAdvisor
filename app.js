@@ -107,9 +107,23 @@ app.get('/private/getLastTwoInterestPoint', function (req, res) {
 
 
 //get 3 random over a specific rank
-app.get('/private/getThreeRandom/:rank', function (req, res, userId) {
+app.get('/private/getThreeRandom/:rank', function (req, res) {
     var float = req.params["rank"];
     DButilsAzure.executeQuery('SELECT TOP 3 name FROM InterestPoints WHERE rank > '.concat(float).concat('ORDER BY newid()'))
+        .then(function(result){
+            res.send(result)
+        })
+        .catch(function(err){
+            console.log(err);
+            res.send(err)
+        })
+});
+
+//get last two reviews of interest point
+app.get('/getLastTwoReviews/:InterestPointID', function (req, res) {
+    var ip_id = req.params["InterestPointID"];
+    var query = 'SELECT TOP 2 id, username, review, addedOn FROM Reviews WHERE [interest point id] = '.concat(ip_id, " ORDER BY addedOn DESC");
+    DButilsAzure.executeQuery(query)
         .then(function(result){
             res.send(result)
         })
