@@ -89,6 +89,21 @@ app.get('/private/getAllFavorites/:username', function (req, res) {
     }
 
 });
+//get last two saved ip of username by token
+app.get('/private/getLastTwoInterestPoint', function (req, res) {
+    var token_username = req.username;
+    var query = 'SELECT TOP 2 id, name, image FROM InterestPoints JOIN InterestPointsOfUsers ON [id] = [interest point id] WHERE username = '.concat("'",token_username,"' ORDER BY addedOn DESC");
+        DButilsAzure.executeQuery(query)
+            .then(function(result){
+                res.send(result)
+            })
+            .catch(function(err){
+                console.log(err);
+                res.send(err)
+            })
+
+
+});
 
 
 //get 3 random over a specific rank
