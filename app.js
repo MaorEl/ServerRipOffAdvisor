@@ -5,6 +5,12 @@ const ip = require('./interestPoints');
 const user = require('./user');
 app.use(express.json()); //hels me read the JSON
 
+//anael edit
+app.use("/", function(req,res,next) {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    next();
+});
+
 app.use("/private", function(req,res,next) {
 user.privateCheck(req,res,next) });
 
@@ -30,7 +36,7 @@ app.get('/private/getAllFavorites',function(req,res) {
 
 
 //get 3 random over a specific rank
-app.get('/private/getThreeRandom/:rank',function(req,res) {
+app.get('/getThreeRandom/:rank',function(req,res) {
     ip.getThreeRandom(req,res);
 });
 
