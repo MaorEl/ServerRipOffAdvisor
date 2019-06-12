@@ -8,6 +8,9 @@ app.use(express.json()); //hels me read the JSON
 //anael edit
 app.use("/", function(req,res,next) {
     res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Headers', 'content-type,x-auth-token');
+    res.setHeader('Access-Control-Allow-Methods', 'POST,GET,PUT,DELETE');
+    // res.setHeader('Access-Control-Allow-Headers', 'Authorization, Lang');
     next();
 });
 
