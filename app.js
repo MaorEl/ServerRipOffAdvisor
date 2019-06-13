@@ -4,12 +4,18 @@ const DButilsAzure = require('./DButils');
 const ip = require('./interestPoints');
 const user = require('./user');
 app.use(express.json()); //hels me read the JSON
+var cors = require('cors');
+app.use(cors());
+
 
 //anael edit
 app.use("/", function(req,res,next) {
     res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Headers', 'content-type,x-auth-token');
-    res.setHeader('Access-Control-Allow-Methods', 'POST,GET,PUT,DELETE');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type,x-auth-token, Access-Control-Allow-Headers, X-Requested-With');
+
+    // res.setHeader('Access-Control-Allow-Headers', 'content-type,x-auth-token, Access-Control-Allow-Headers, Authorization, X-Requested-With');
+    res.setHeader('Access-Control-Allow-Methods', 'POST,GET,PUT,DELETE, OPTIONS');
+
     next();
 });
 

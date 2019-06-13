@@ -63,7 +63,7 @@ function register(req,res) {
                     })
             });
 
-            res.status(201).send(result)
+            res.status(`201`).send(result)
         })
         .catch(function(err){
             console.log(err);

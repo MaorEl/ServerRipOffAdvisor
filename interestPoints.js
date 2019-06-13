@@ -33,8 +33,8 @@ function getTwoPopularInterestPoints(req, res) {
         "\n" +
         "\tSELECT DISTINCT [category id]\n" +
         "\tINTO #TMP\n" +
-        "\tFROM [dbo].[InterestPoints] I INNER JOIN [dbo].[InterestPointsOfUsers] U\n" +
-        "\t\tON I.id = U.[interest point id]\n" +
+        "\tFROM [dbo].[InterestPoints] I INNER JOIN [dbo].[CategoriesOfUsers] U\n" +
+        "\t\tON I.[category id] = U.[category_id]\n" +
         "\tWHERE U.username LIKE '" + req.username + "'\n" +
         "\n" +
         "\n" +
