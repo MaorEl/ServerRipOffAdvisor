@@ -12,8 +12,6 @@ app.use(cors());
 app.use("/", function(req,res,next) {
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type,x-auth-token, Access-Control-Allow-Headers, X-Requested-With');
-
-    // res.setHeader('Access-Control-Allow-Headers', 'content-type,x-auth-token, Access-Control-Allow-Headers, Authorization, X-Requested-With');
     res.setHeader('Access-Control-Allow-Methods', 'POST,GET,PUT,DELETE, OPTIONS');
 
     next();
