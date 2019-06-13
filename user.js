@@ -1,3 +1,5 @@
+
+
 const DButilsAzure = require('./DButils');
 const jwt = require("jsonwebtoken");
 
@@ -171,6 +173,18 @@ function privateCheck(req, res,next) {
     }
 }
 
+function getUserQuestion(req,res){
+    var user = req.params["username"];
+    DButilsAzure.executeQuery("SELECT DISTINCT Q.[id],Q.[question] FROM Questions Q INNER JOIN UsersAnswers A ON Q.[id] = A.[question_id] WHERE A.[username] = '" +user +"'")
+        .then(function(result){
+            res.send(result)
+        })
+        .catch(function(err){
+            console.log(err);
+            res.send(err)
+        })
+}
+
 exports.privateCheck = privateCheck;
 exports.getAllQuestions = getAllQuestions;
 exports.getAllCountries = getAllCountries;
@@ -178,3 +192,4 @@ exports.register = register;
 exports.login = login;
 exports.InsertAnswer = InsertAnswer;
 exports.RestorePassword = RestorePassword;
+exports.getUserQuestion = getUserQuestion;

@@ -131,6 +131,10 @@ app.post("/RestorePassword", function(req,res) {
     user.RestorePassword(req,res);
 });
 
+app.get("/getUserQuestion/:username", function (req,res) {
+    user.getUserQuestion(req,res);
+});
+
 
 var server = app.listen(5000, function () {
     console.log('Server is running..');
