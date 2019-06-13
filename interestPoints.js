@@ -28,12 +28,49 @@ function getLastTwoReviews (req, res) {
 
 function getTwoPopularInterestPoints(req, res) {
     //var query = "SELECT I.* FROM InterestPoints I JOIN InterestPointsOfUsers U ON [id] = [interest point id] WHERE InterestPoints.rank>3.5 AND username = ".concat("'",req.username,"'");
-    let query = "SELECT TOP 2 I.* \n" +
-        "FROM [dbo].[InterestPoints] I INNER JOIN [dbo].[CategoriesOfUsers] U \n" +
-        "ON I.[category id] = U.[category_id] \n" +
-        "WHERE U.[username] LIKE '" + req.username + "' \n" +
-        "ORDER BY I.[rank] DESC";
-    DButilsAzure.executeQuery(query)
+    let query = "IF OBJECT_ID('tempdb.dbo.#TMP', 'U') IS NOT NULL\n" +
+        "\t\tDROP TABLE #TMP;\n" +
+        "\n" +
+        "\tSELECT DISTINCT [category id]\n" +
+        "\tINTO #TMP\n" +
+        "\tFROM [dbo].[InterestPoints] I INNER JOIN [dbo].[InterestPointsOfUsers] U\n" +
+        "\t\tON I.id = U.[interest point id]\n" +
+        "\tWHERE U.username LIKE '" + req.username + "'\n" +
+        "\n" +
+        "\n" +
+        "\tDECLARE @CAT AS INT\n" +
+        "\tDECLARE @MAX AS INT = 0\n" +
+        "\n" +
+        "\tIF OBJECT_ID('tempdb.dbo.#TMP_INTERERSTPOINTS_MAX', 'U') IS NOT NULL\n" +
+        "\t\tDROP TABLE #TMP_INTERERSTPOINTS_MAX;\n" +
+        "\n" +
+        "\tSELECT TOP 0 *\n" +
+        "\tINTO #TMP_INTERERSTPOINTS_MAX\n" +
+        "\tFROM [dbo].[InterestPoints]\n" +
+        "\n" +
+        "\tDECLARE db_cursor CURSOR FOR\tSELECT [category id] \n" +
+        "\t\t\t\t\t\t\t\t\tFROM #TMP\n" +
+        "\tOPEN db_cursor  \n" +
+        "\tFETCH NEXT FROM db_cursor INTO @CAT  \n" +
+        "\tWHILE @@FETCH_STATUS = 0  \n" +
+        "\tBEGIN  \n" +
+        "\t\t  \n" +
+        "\t\t  SET @MAX = ((\tSELECT MAX([rank])\n" +
+        "\t\t\t\t\t\tFROM [dbo].[InterestPoints] ))\n" +
+        "\n" +
+        "\t\t  INSERT INTO #TMP_INTERERSTPOINTS_MAX\n" +
+        "\t\t  SELECT TOP 1 *\n" +
+        "\t\t  FROM [dbo].[InterestPoints]\n" +
+        "\t\t  WHERE [category id] = @CAT AND [RANK] = @MAX\n" +
+        "\n" +
+        "\t\t  FETCH NEXT FROM db_cursor INTO @CAT \n" +
+        "\tEND \n" +
+        "\n" +
+        "\tCLOSE db_cursor  \n" +
+        "\tDEALLOCATE db_cursor \n" +
+        "\n" +
+        "\tSELECT * FROM #TMP_INTERERSTPOINTS_MAX";
+        DButilsAzure.executeQuery(query)
         .then(function(result){
             console.log("return 2 popular interest points by user preferences");
             res.send(result);
