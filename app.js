@@ -31,7 +31,7 @@ app.get('/private/getAllQuestions',function(req,res) {
 });
 
 //get all countries
-app.get('/private/getAllCountries', function(req, res) {
+app.get('/getAllCountries', function(req, res) {
     user.getAllCountries(req,res);
 });
 
