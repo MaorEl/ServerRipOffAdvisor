@@ -96,6 +96,10 @@ app.get('/searchForInterestPoint/:name', function(req,res){
 app.get('/getAllInterestPointsByCategory/:categoryID',function(req,res){
     ip.getAllInterestPointsByCategory(req,res);
 });
+//get all interst points by category (search) and sorted by raml
+app.get('/getAllInterestPointsByCategorySortedByRank/:categoryID',function(req,res){
+    ip.getAllInterestPointsByCategorySortedByRank(req,res);
+});
 
 //get one interst point by id (search)
 app.get('/getIntertestPointDetails/:interestPointID', function(req,res){
