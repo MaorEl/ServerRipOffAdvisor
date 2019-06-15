@@ -192,16 +192,14 @@ function rankInterestPoint(req, res) {
             max_result = result;
             max = max_result[0].id + 1;
             req.body.description = req.body.description.replace("'", "''");
-            var check_query = "IF NOT EXISTS (SELECT * FROM Reviews WHERE [username] = '".concat(req.username, "' and [interest point id] = ", req.body.interestPointID, ") BEGIN ");
-            query = check_query.concat('INSERT INTO Reviews (id, username, review, rating, [interest point id]) VALUES ('.concat(max, ", '", req.username, "' ,'", req.body.description, "',", req.body.rank, ",", req.body.interestPointID, ')'), " END;");
+            var check_query = "";
+            query = check_query.concat('INSERT INTO Reviews (id, username, review, rating, [interest point id]) VALUES ('.concat(max, ", '", req.username, "' ,'", req.body.description, "',", req.body.rank, ",", req.body.interestPointID, ')'));
             DButilsAzure.executeQuery(query)
                 .then(function (result) {
                     res.send(result);
 
                     var sum = 0;
                     var count = 0;
-
-
                     var count_query = 'SELECT COUNT(*) FROM Reviews WHERE [interest point id] = '.concat("'", req.body.interestPointID, "'");
                     DButilsAzure.executeQuery(count_query)
                         .then(function (result) {
