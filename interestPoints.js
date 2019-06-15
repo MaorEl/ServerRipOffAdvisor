@@ -217,6 +217,7 @@ function rankInterestPoint(req, res) {
                                     var update_rating_query = 'UPDATE InterestPoints SET rank = '.concat(new_rank," WHERE id = ",req.body.interestPointID);
                                     DButilsAzure.executeQuery(update_rating_query)
                                         .then(function(result){
+                                            //todo: wtf is goinf here
                                         })
                                         .catch(function(err){
                                             console.log("line 305");

@@ -28,7 +28,7 @@ app.get('/getAllCategories', function(req,res) {
 
 
 //get all question
-app.get('/private/getAllQuestions',function(req,res) {
+app.get('/getAllQuestions',function(req,res) {
     user.getAllQuestions(req,res);
 });
 
