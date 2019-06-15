@@ -307,7 +307,7 @@ function getAllCategories(req, res) {
 
 function getAllFavorites(req, res) {
     var token_username = req.username;
-    var query = 'SELECT * FROM InterestPoints JOIN InterestPointsOfUsers ON [id] = [interest point id] WHERE username = '.concat("'", token_username, "' ORDER BY i DESC");
+    var query = 'SELECT * FROM InterestPoints JOIN InterestPointsOfUsers ON [id] = [interest point id] WHERE username = '.concat("'", token_username, "' ORDER BY i ASC");
     DButilsAzure.executeQuery(query)
         .then(function (result) {
             res.send(result)
