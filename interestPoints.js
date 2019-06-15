@@ -191,7 +191,7 @@ function rankInterestPoint(req, res) {
         .then(function (result) {
             max_result = result;
             max = max_result[0].id + 1;
-            req.body.description = req.body.description.replace("'", "''");
+            req.body.description = req.body.description.replaceAll("'", "''");
             var check_query = "";
             query = check_query.concat('INSERT INTO Reviews (id, username, review, rating, [interest point id]) VALUES ('.concat(max, ", '", req.username, "' ,'", req.body.description, "',", req.body.rank, ",", req.body.interestPointID, ')'));
             DButilsAzure.executeQuery(query)
