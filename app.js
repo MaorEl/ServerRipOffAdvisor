@@ -26,7 +26,7 @@ app.get('/getAllCategories', function(req,res) {
 
 
 //get all question
-app.get('/private/getAllQuestions',function(req,res) {
+app.get('/getAllQuestions',function(req,res) {
     user.getAllQuestions(req,res);
 });
 
@@ -93,6 +93,10 @@ app.get('/searchForInterestPoint/:name', function(req,res){
 //get all interst points by category (search)
 app.get('/getAllInterestPointsByCategory/:categoryID',function(req,res){
     ip.getAllInterestPointsByCategory(req,res);
+});
+//get all interst points by category (search) and sorted by raml
+app.get('/getAllInterestPointsByCategorySortedByRank/:categoryID',function(req,res){
+    ip.getAllInterestPointsByCategorySortedByRank(req,res);
 });
 
 //get one interst point by id (search)

@@ -13,6 +13,19 @@ function getAllInterestPointsByCategory (req, res) {
         })
     }
 
+function getAllInterestPointsByCategorySortedByRank (req, res) {
+    var string = req.params["categoryID"];
+    var query = 'SELECT * FROM InterestPoints WHERE [category id] = '.concat(string, ' ORDER by RANK DESC');
+    DButilsAzure.executeQuery(query)
+        .then(function(result){
+            res.send(result)
+        })
+        .catch(function(err){
+            console.log(err);
+            res.send(err)
+        })
+}
+
 function getLastTwoReviews (req, res) {
     var ip_id = req.params["InterestPointID"];
     var query = 'SELECT TOP 2 * FROM Reviews WHERE [interest point id] = '.concat(ip_id, " ORDER BY addedOn DESC");
@@ -204,6 +217,7 @@ function rankInterestPoint(req, res) {
                                     var update_rating_query = 'UPDATE InterestPoints SET rank = '.concat(new_rank," WHERE id = ",req.body.interestPointID);
                                     DButilsAzure.executeQuery(update_rating_query)
                                         .then(function(result){
+                                            //todo: wtf is goinf here
                                         })
                                         .catch(function(err){
                                             console.log("line 305");
@@ -360,3 +374,4 @@ function getTopFivePhotos (req, res) {
     exports.searchForInterestPoint  = searchForInterestPoint;
     exports.getTopFivePhotos = getTopFivePhotos;
     exports.viewInterestPoint = viewInterestPoint;
+    exports.getAllInterestPointsByCategorySortedByRank = getAllInterestPointsByCategorySortedByRank;

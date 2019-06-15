@@ -127,22 +127,28 @@ function RestorePassword(req , res) {
         question: req.body.question,
         answer: req.body.answer
     };
+    var query = "SELECT * FROM UsersAnswers \n" +
+        "WHERE [username] LIKE '" +user.username + "' AND [question_id] LIKE '" +user.question + "' AND [answer] LIKE '" +user.answer+"'";
     console.log("got this user: " + req.body.username);
-    DButilsAzure.executeQuery("SELECT * FROM UsersAnswers \n" +
-        "WHERE [username] LIKE '" +user.username + "' AND [question_id] LIKE '" +user.question + "' AND [answer] LIKE '" +user.answer+"'")
+    DButilsAzure.executeQuery(query)
         .then(function(result){
             if (result.length === 1){
                 DButilsAzure.executeQuery("SELECT [password] FROM Users WHERE [username] LIKE '" +user.username + "'")
                     .then(function (result) {
                         res.send(result)
                     })
+                    .catch(function(err){
+                    console.log(err);
+                    res.send(err)
+                })
             }
-            //res.send(result)
-        })
-        .catch(function(err){
-            console.log(err);
-            res.send(err)
-        })
+            else {
+                res.send(result)
+            }
+
+        },function myError(response) {
+            console.log("problem");
+        });
     //res.status(201).send(username);
 }
 
