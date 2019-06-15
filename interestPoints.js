@@ -28,7 +28,7 @@ function getAllInterestPointsByCategorySortedByRank(req, res) {
 
 function getLastTwoReviews(req, res) {
     var ip_id = req.params["InterestPointID"];
-    var query = 'SELECT TOP 2 * FROM Reviews WHERE [interest point id] = '.concat(ip_id, " AND ([review] IS NOT NULL OR [review] NOT LIKE '') ORDER BY addedOn DESC");
+    var query = 'SELECT TOP 2 * FROM Reviews WHERE [interest point id] = '.concat(ip_id, " AND ([review] IS NOT NULL AND [review] NOT LIKE '') ORDER BY addedOn DESC");
     DButilsAzure.executeQuery(query)
         .then(function (result) {
             res.send(result)
