@@ -1,5 +1,3 @@
-
-
 //this is only an example, handling everything is yours responsibilty !
 //this is an example - open and close the connection in each request
 
@@ -18,7 +16,7 @@ var connectionConfig = {
     userName: 'maorelf',
     password: 'x5RwysYw',
     server: 'assignment3webdev3maor.database.windows.net',
-    options: { encrypt: true, database: 'Ass3DB3' }
+    options: {encrypt: true, database: 'Ass3DB3'}
 };
 
 //create the pool
@@ -27,7 +25,7 @@ var pool = new ConnectionPool(poolConfig, connectionConfig)
 pool.on('error', function (err) {
     if (err) {
         console.log(err);
-       
+
     }
 });
 console.log('pool connection on');
@@ -81,8 +79,7 @@ exports.executeQuery = function (query) {
                 connection.execSql(dbReq);
 
             });
-        }
-        catch (err) {
+        } catch (err) {
             reject(err)
         }
     });
