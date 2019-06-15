@@ -1,39 +1,39 @@
 const DButilsAzure = require('./DButils');
 
-function getAllInterestPointsByCategory (req, res) {
+function getAllInterestPointsByCategory(req, res) {
     var string = req.params["categoryID"];
     var query = 'SELECT * FROM InterestPoints WHERE [category id] = '.concat(string);
     DButilsAzure.executeQuery(query)
-        .then(function(result){
+        .then(function (result) {
             res.send(result)
         })
-        .catch(function(err){
-            console.log(err);
-            res.send(err)
-        })
-    }
-
-function getAllInterestPointsByCategorySortedByRank (req, res) {
-    var string = req.params["categoryID"];
-    var query = 'SELECT * FROM InterestPoints WHERE [category id] = '.concat(string, ' ORDER by RANK DESC');
-    DButilsAzure.executeQuery(query)
-        .then(function(result){
-            res.send(result)
-        })
-        .catch(function(err){
+        .catch(function (err) {
             console.log(err);
             res.send(err)
         })
 }
 
-function getLastTwoReviews (req, res) {
+function getAllInterestPointsByCategorySortedByRank(req, res) {
+    var string = req.params["categoryID"];
+    var query = 'SELECT * FROM InterestPoints WHERE [category id] = '.concat(string, ' ORDER by RANK DESC');
+    DButilsAzure.executeQuery(query)
+        .then(function (result) {
+            res.send(result)
+        })
+        .catch(function (err) {
+            console.log(err);
+            res.send(err)
+        })
+}
+
+function getLastTwoReviews(req, res) {
     var ip_id = req.params["InterestPointID"];
     var query = 'SELECT TOP 2 * FROM Reviews WHERE [interest point id] = '.concat(ip_id, " ORDER BY addedOn DESC");
     DButilsAzure.executeQuery(query)
-        .then(function(result){
+        .then(function (result) {
             res.send(result)
         })
-        .catch(function(err){
+        .catch(function (err) {
             console.log(err);
             res.send(err)
         })
@@ -83,12 +83,12 @@ function getTwoPopularInterestPoints(req, res) {
         "\tDEALLOCATE db_cursor \n" +
         "\n" +
         "\tSELECT * FROM #TMP_INTERERSTPOINTS_MAX";
-        DButilsAzure.executeQuery(query)
-        .then(function(result){
+    DButilsAzure.executeQuery(query)
+        .then(function (result) {
             console.log("return 2 popular interest points by user preferences");
             res.send(result);
         })
-        .catch(function(err){
+        .catch(function (err) {
             console.log(err);
             res.send(err)
         })
@@ -103,10 +103,10 @@ function getLastTwoSavedInterestPoints(req, res) {
         "ORDER BY U.[addedOn] DESC";
 
     DButilsAzure.executeQuery(query)
-        .then(function(result){
+        .then(function (result) {
             res.send(result);
         })
-        .catch(function(err){
+        .catch(function (err) {
             console.log(err);
             res.send(err)
         })
@@ -114,10 +114,10 @@ function getLastTwoSavedInterestPoints(req, res) {
 
 function getAllInterestPoints(req, res) {
     DButilsAzure.executeQuery('SELECT * FROM InterestPoints')
-        .then(function(result){
+        .then(function (result) {
             res.send(result)
         })
-        .catch(function(err){
+        .catch(function (err) {
             console.log(err);
             res.send(err)
         })
@@ -127,54 +127,54 @@ function getIntertestPointDetails(req, res) {
     var string = req.params["interestPointID"];
     var query = 'SELECT * FROM InterestPoints WHERE [id] = '.concat(string);
     DButilsAzure.executeQuery(query)
-        .then(function(result){
+        .then(function (result) {
             res.send(result)
         })
-        .catch(function(err){
+        .catch(function (err) {
             console.log(err);
             res.send(err)
         })
 }
 
-function  viewInterestPoint(req, res) {
+function viewInterestPoint(req, res) {
     var ip_id = req.params["InterestPointID"];
     var query = "UPDATE [dbo].[InterestPoints] \n" +
-        "SET [views] = ((SELECT [views] FROM [dbo].[InterestPoints] WHERE [id] = " +ip_id +")) + 1 \n" +
-        "WHERE [id] = " +ip_id ;
+        "SET [views] = ((SELECT [views] FROM [dbo].[InterestPoints] WHERE [id] = " + ip_id + ")) + 1 \n" +
+        "WHERE [id] = " + ip_id;
     DButilsAzure.executeQuery(query)
-        .then(function(result){
+        .then(function (result) {
             res.send(result)
         })
-        .catch(function(err){
+        .catch(function (err) {
             console.log(err);
             res.send(err)
         })
 }
 
-function addToFavorites (req, res) {
+function addToFavorites(req, res) {
 
-    var InterestPointID =  req.query.ip_id;
+    var InterestPointID = req.query.ip_id;
     var i = 1;
 
-    var query = "SELECT i FROM InterestPointsOfUsers WHERE i=(SELECT max(i) FROM InterestPointsOfUsers WHERE [username] = '".concat(req.username,"') " +
-        "AND [username] = '",req.username,"'");
-    DButilsAzure.executeQuery(query).then(function(result) {
+    var query = "SELECT i FROM InterestPointsOfUsers WHERE i=(SELECT max(i) FROM InterestPointsOfUsers WHERE [username] = '".concat(req.username, "') " +
+        "AND [username] = '", req.username, "'");
+    DButilsAzure.executeQuery(query).then(function (result) {
         var x = result;
         for (var key in result[0]) {
-            i = result[0][key] +1;
+            i = result[0][key] + 1;
         }
 
         //var query = 'INSERT INTO InterestPointsOfUsers VALUES ('.concat("'",req.username,"' ,",InterestPointID,",",i,")");
-        var query = 'INSERT INTO InterestPointsOfUsers (username, [interest point id], i) VALUES ('.concat("'",req.username,"' ,",InterestPointID,",",i,")");
+        var query = 'INSERT INTO InterestPointsOfUsers (username, [interest point id], i) VALUES ('.concat("'", req.username, "' ,", InterestPointID, ",", i, ")");
         DButilsAzure.executeQuery(query)
-            .then(function(result){
+            .then(function (result) {
                 res.send(result)
             })
-            .catch(function(err){
+            .catch(function (err) {
                 console.log(err);
                 res.send(err)
             })
-    }).catch(function(err){
+    }).catch(function (err) {
         console.log(err);
         res.send(err)
     })
@@ -188,44 +188,45 @@ function rankInterestPoint(req, res) {
     var query = 'SELECT id FROM Reviews WHERE id=(SELECT max(id) FROM Reviews)';
     var max_result = null;
     DButilsAzure.executeQuery(query)
-        .then(function(result){
+        .then(function (result) {
             max_result = result;
             max = max_result[0].id + 1;
-            req.body.description = req.body.description.replace("'","''");
-            var check_query = "IF NOT EXISTS (SELECT * FROM Reviews WHERE [username] = '".concat(req.username,"' and [interest point id] = ",req.body.interestPointID,") BEGIN ");
-            query = check_query.concat('INSERT INTO Reviews (id, username, review, rating, [interest point id]) VALUES ('.concat(max,", '",req.username,"' ,'",req.body.description,"',",req.body.rank,",", req.body.interestPointID,')')," END;");
+            req.body.description = req.body.description.replace("'", "''");
+            var check_query = "IF NOT EXISTS (SELECT * FROM Reviews WHERE [username] = '".concat(req.username, "' and [interest point id] = ", req.body.interestPointID, ") BEGIN ");
+            query = check_query.concat('INSERT INTO Reviews (id, username, review, rating, [interest point id]) VALUES ('.concat(max, ", '", req.username, "' ,'", req.body.description, "',", req.body.rank, ",", req.body.interestPointID, ')'), " END;");
             DButilsAzure.executeQuery(query)
-                .then(function(result){
+                .then(function (result) {
                     res.send(result);
 
                     var sum = 0;
                     var count = 0;
 
 
-                    var count_query = 'SELECT COUNT(*) FROM Reviews WHERE [interest point id] = '.concat("'",req.body.interestPointID,"'");
+                    var count_query = 'SELECT COUNT(*) FROM Reviews WHERE [interest point id] = '.concat("'", req.body.interestPointID, "'");
                     DButilsAzure.executeQuery(count_query)
-                        .then(function(result){
+                        .then(function (result) {
                             for (var key in result[0]) {
                                 count = result[0][key];
                             }
-                            var sum_query = 'SELECT SUM(rating) FROM Reviews WHERE [interest point id] = '.concat("'",req.body.interestPointID,"'");
+                            var sum_query = 'SELECT SUM(rating) FROM Reviews WHERE [interest point id] = '.concat("'", req.body.interestPointID, "'");
                             DButilsAzure.executeQuery(sum_query)
-                                .then(function(result){
+                                .then(function (result) {
                                     for (var key in result[0]) {
                                         sum = result[0][key];
-                                    }                                    var new_rank = sum / count;
-                                    var update_rating_query = 'UPDATE InterestPoints SET rank = '.concat(new_rank," WHERE id = ",req.body.interestPointID);
+                                    }
+                                    var new_rank = sum / count;
+                                    var update_rating_query = 'UPDATE InterestPoints SET rank = '.concat(new_rank, " WHERE id = ", req.body.interestPointID);
                                     DButilsAzure.executeQuery(update_rating_query)
-                                        .then(function(result){
+                                        .then(function (result) {
                                             //todo: wtf is goinf here
                                         })
-                                        .catch(function(err){
+                                        .catch(function (err) {
                                             console.log("line 305");
                                             console.log(err);
                                             res.send(err)
                                         })
                                 })
-                                .catch(function(err){
+                                .catch(function (err) {
                                     console.log("line 292");
 
                                     console.log(err);
@@ -234,26 +235,24 @@ function rankInterestPoint(req, res) {
                                 });
 
                         })
-                        .catch(function(err){
+                        .catch(function (err) {
                             console.log("line 281");
                             console.log(err);
                             res.send(err)
                         });
 
                 })
-                .catch(function(err){
+                .catch(function (err) {
                     console.log("line 267");
                     console.log(err);
                     res.send(err)
                 });
 
         })
-        .catch(function(err){
+        .catch(function (err) {
             console.log(err);
             res.send(err)
         });
-
-
 
 
 }
@@ -276,16 +275,16 @@ function deleteFromFavorites(req, res) {
 
 function updateSortOption(req, res) {
     var ip_id, i;
-    var username =  req.username;
+    var username = req.username;
     for (var key in req.body) {
         ip_id = req.body[key]["interestPointID"];
         i = req.body[key]['i'];
-        var query = 'UPDATE InterestPointsOfUsers SET i = '.concat(i, " WHERE [username] = '",username,"' AND [interest point id] = ",ip_id);
+        var query = 'UPDATE InterestPointsOfUsers SET i = '.concat(i, " WHERE [username] = '", username, "' AND [interest point id] = ", ip_id);
         DButilsAzure.executeQuery(query)
-            .then(function(result){
+            .then(function (result) {
                 res.send(result)
             })
-            .catch(function(err){
+            .catch(function (err) {
                 console.log("failed to update in updateSortOption");
                 console.log(err);
                 res.send(err)
@@ -296,16 +295,16 @@ function updateSortOption(req, res) {
 
 function getAllCategories(req, res) {
     DButilsAzure.executeQuery('SELECT * FROM Categories')
-        .then(function(result){
+        .then(function (result) {
             res.send(result)
         })
-        .catch(function(err){
+        .catch(function (err) {
             console.log(err)
             res.send(err)
         })
 }
 
-function getAllFavorites (req, res) {
+function getAllFavorites(req, res) {
     var token_username = req.username;
     var query = 'SELECT * FROM InterestPoints JOIN InterestPointsOfUsers ON [id] = [interest point id] WHERE username = '.concat("'", token_username, "' ORDER BY i DESC");
     DButilsAzure.executeQuery(query)
@@ -321,10 +320,10 @@ function getAllFavorites (req, res) {
 function getThreeRandom(req, res) {
     var float = req.params["rank"];
     DButilsAzure.executeQuery('SELECT TOP 3 * FROM InterestPoints WHERE rank >= '.concat(float).concat('ORDER BY newid()'))
-        .then(function(result){
+        .then(function (result) {
             res.send(result)
         })
-        .catch(function(err){
+        .catch(function (err) {
             console.log(err);
             res.send(err)
         })
@@ -334,16 +333,16 @@ function searchForInterestPoint(req, res) {
     var string = req.params["name"];
     var query = 'SELECT * FROM InterestPoints WHERE name LIKE '.concat("'%", string).concat("%'");
     DButilsAzure.executeQuery(query)
-        .then(function(result){
+        .then(function (result) {
             res.send(result)
         })
-        .catch(function(err){
+        .catch(function (err) {
             console.log(err);
             res.send(err)
         })
 }
 
-function getTopFivePhotos (req, res) {
+function getTopFivePhotos(req, res) {
     DButilsAzure.executeQuery('SELECT TOP 5 image FROM InterestPoints ORDER BY views DESC')
         .then(function (result) {
             res.send(result)
@@ -355,23 +354,20 @@ function getTopFivePhotos (req, res) {
 }
 
 
-
-
-
-    exports.getAllInterestPointsByCategory = getAllInterestPointsByCategory;
-    exports.getLastTwoReviews = getLastTwoReviews;
-    exports.getTwoPopularInterestPoints = getTwoPopularInterestPoints;
-    exports.getLastTwoSavedInterestPoints = getLastTwoSavedInterestPoints;
-    exports.getAllInterestPoints = getAllInterestPoints;
-    exports.getIntertestPointDetails = getIntertestPointDetails;
-    exports.addToFavorites = addToFavorites;
-    exports.rankInterestPoint = rankInterestPoint;
-    exports.deleteFromFavorites = deleteFromFavorites;
-    exports.updateSortOption = updateSortOption;
-    exports.getAllCategories = getAllCategories;
-    exports.getAllFavorites = getAllFavorites;
-    exports.getThreeRandom = getThreeRandom;
-    exports.searchForInterestPoint  = searchForInterestPoint;
-    exports.getTopFivePhotos = getTopFivePhotos;
-    exports.viewInterestPoint = viewInterestPoint;
-    exports.getAllInterestPointsByCategorySortedByRank = getAllInterestPointsByCategorySortedByRank;
+exports.getAllInterestPointsByCategory = getAllInterestPointsByCategory;
+exports.getLastTwoReviews = getLastTwoReviews;
+exports.getTwoPopularInterestPoints = getTwoPopularInterestPoints;
+exports.getLastTwoSavedInterestPoints = getLastTwoSavedInterestPoints;
+exports.getAllInterestPoints = getAllInterestPoints;
+exports.getIntertestPointDetails = getIntertestPointDetails;
+exports.addToFavorites = addToFavorites;
+exports.rankInterestPoint = rankInterestPoint;
+exports.deleteFromFavorites = deleteFromFavorites;
+exports.updateSortOption = updateSortOption;
+exports.getAllCategories = getAllCategories;
+exports.getAllFavorites = getAllFavorites;
+exports.getThreeRandom = getThreeRandom;
+exports.searchForInterestPoint = searchForInterestPoint;
+exports.getTopFivePhotos = getTopFivePhotos;
+exports.viewInterestPoint = viewInterestPoint;
+exports.getAllInterestPointsByCategorySortedByRank = getAllInterestPointsByCategorySortedByRank;

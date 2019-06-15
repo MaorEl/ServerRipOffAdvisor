@@ -9,7 +9,7 @@ app.use(cors());
 
 
 //anael edit
-app.use("/", function(req,res,next) {
+app.use("/", function (req, res, next) {
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type,x-auth-token, Access-Control-Allow-Headers, X-Requested-With');
     res.setHeader('Access-Control-Allow-Methods', 'POST,GET,PUT,DELETE, OPTIONS');
@@ -17,129 +17,131 @@ app.use("/", function(req,res,next) {
     next();
 });
 
-app.use("/private", function(req,res,next) {
-user.privateCheck(req,res,next) });
+app.use("/private", function (req, res, next) {
+    user.privateCheck(req, res, next)
+});
 
-app.get('/getAllCategories', function(req,res) {
-    ip.getAllCategories(req,res);
+app.get('/getAllCategories', function (req, res) {
+    ip.getAllCategories(req, res);
 });
 
 
 //get all question
-app.get('/getAllQuestions',function(req,res) {
-    user.getAllQuestions(req,res);
+app.get('/getAllQuestions', function (req, res) {
+    user.getAllQuestions(req, res);
 });
 
 //get all countries
-app.get('/getAllCountries', function(req, res) {
-    user.getAllCountries(req,res);
+app.get('/getAllCountries', function (req, res) {
+    user.getAllCountries(req, res);
 });
 
 //get all favorites of username
-app.get('/private/getAllFavorites',function(req,res) {
-    ip.getAllFavorites(req,res);
+app.get('/private/getAllFavorites', function (req, res) {
+    ip.getAllFavorites(req, res);
 });
 
 
 //get 3 random over a specific rank
-app.get('/getThreeRandom/:rank',function(req,res) {
-    ip.getThreeRandom(req,res);
+app.get('/getThreeRandom/:rank', function (req, res) {
+    ip.getThreeRandom(req, res);
 });
 
 //get last two reviews of interest point
-app.get('/getLastTwoReviews/:InterestPointID', function(req,res) {
-    ip.getLastTwoReviews(req,res);
+app.get('/getLastTwoReviews/:InterestPointID', function (req, res) {
+    ip.getLastTwoReviews(req, res);
 });
 
-app.put('/viewInterestPoint/:InterestPointID',function(req,res) {
-    ip.viewInterestPoint(req,res);
+app.put('/viewInterestPoint/:InterestPointID', function (req, res) {
+    ip.viewInterestPoint(req, res);
 });
 
 //get 2 popular interest points of user
-app.get('/private/getTwoPopularInterestPoints',function(req,res) {
+app.get('/private/getTwoPopularInterestPoints', function (req, res) {
 
-ip.getTwoPopularInterestPoints(req,res)});
+    ip.getTwoPopularInterestPoints(req, res)
+});
 
 //get last 2 interest points
-app.get('/private/getLastTwoSavedInterestPoints',function(req,res) {
-    ip.getLastTwoSavedInterestPoints(req,res);
-} );
+app.get('/private/getLastTwoSavedInterestPoints', function (req, res) {
+    ip.getLastTwoSavedInterestPoints(req, res);
+});
 
 
-app.post("/register", function(req,res) {
+app.post("/register", function (req, res) {
 
- user.register(req,res);});
+    user.register(req, res);
+});
 
-app.post("/login", function(req,res) {
-    user.login(req,res);
+app.post("/login", function (req, res) {
+    user.login(req, res);
 });
 
 //get all question
-app.get('/getAllInterestPoints',function(req,res) {
+app.get('/getAllInterestPoints', function (req, res) {
 
-ip.getAllInterestPoints(req,res);
+    ip.getAllInterestPoints(req, res);
 });
 
 //get top 5 photos
-app.get('/getTopFivePhotos', function(req,res) {
-    ip.getTopFivePhotos(req,res);
+app.get('/getTopFivePhotos', function (req, res) {
+    ip.getTopFivePhotos(req, res);
 });
 
 //get interst points by name (search)
-app.get('/searchForInterestPoint/:name', function(req,res){
-    ip.searchForInterestPoint(req,res);
-} );
+app.get('/searchForInterestPoint/:name', function (req, res) {
+    ip.searchForInterestPoint(req, res);
+});
 
 //get all interst points by category (search)
-app.get('/getAllInterestPointsByCategory/:categoryID',function(req,res){
-    ip.getAllInterestPointsByCategory(req,res);
+app.get('/getAllInterestPointsByCategory/:categoryID', function (req, res) {
+    ip.getAllInterestPointsByCategory(req, res);
 });
 //get all interst points by category (search) and sorted by raml
-app.get('/getAllInterestPointsByCategorySortedByRank/:categoryID',function(req,res){
-    ip.getAllInterestPointsByCategorySortedByRank(req,res);
+app.get('/getAllInterestPointsByCategorySortedByRank/:categoryID', function (req, res) {
+    ip.getAllInterestPointsByCategorySortedByRank(req, res);
 });
 
 //get one interst point by id (search)
-app.get('/getIntertestPointDetails/:interestPointID', function(req,res){
-    ip.getIntertestPointDetails(req,res);
+app.get('/getIntertestPointDetails/:interestPointID', function (req, res) {
+    ip.getIntertestPointDetails(req, res);
 });
 
 
-app.post("/InsertAnswer", function(req,res){
-    user.InsertAnswer(req,res);
+app.post("/InsertAnswer", function (req, res) {
+    user.InsertAnswer(req, res);
 });
 
 //set interst point index to sort it
 //will get JSON of JSONS({"interestPointID", "i"})
 
-app.put('/private/updateSortOption', function(req,res) {
-    ip.updateSortOption(req,res);
+app.put('/private/updateSortOption', function (req, res) {
+    ip.updateSortOption(req, res);
 });
 
 
 //add interest point to favorites. get param of ip_id
-app.post('/private/addToFavorites', function(req,res){
-    ip.addToFavorites(req,res);
+app.post('/private/addToFavorites', function (req, res) {
+    ip.addToFavorites(req, res);
 });
 
 //rank interest point by user
-app.post('/private/rankInterestPoint', function(req,res){
-    ip.rankInterestPoint(req,res);
+app.post('/private/rankInterestPoint', function (req, res) {
+    ip.rankInterestPoint(req, res);
 });
 
 //add interst point to favorites. get param of ip_id
-app.delete('/private/deleteFromFavorites', function(req,res) {
-    ip.deleteFromFavorites(req,res);
+app.delete('/private/deleteFromFavorites', function (req, res) {
+    ip.deleteFromFavorites(req, res);
 });
 
 
-
-app.post("/RestorePassword", function(req,res) {
-    user.RestorePassword(req,res);
+app.post("/RestorePassword", function (req, res) {
+    user.RestorePassword(req, res);
 });
 
-app.get("/getUserQuestion/:username", function (req,res) {
-    user.getUserQuestion(req,res);
+app.get("/getUserQuestion/:username", function (req, res) {
+    user.getUserQuestion(req, res);
 });
 
 
