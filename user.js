@@ -7,6 +7,9 @@ secret = "secret";
 
 function register(req, res) {
 
+
+    var suc = true;
+
     const user = {
         username: req.body.username,
         first_name: req.body.first_name,
@@ -19,22 +22,27 @@ function register(req, res) {
     };
 
     if (user.username.length < 3 || user.username.length > 8) {
+        suc = false;
         res.status(400).send('Problem with username length!');
     }
     if (user.password.length < 5 || user.password.length > 10) {
+        suc = false;
         res.statusCode = 400;
         res.send("Problem with password length!");
     }
     if (!(/^[a-zA-Z]+$/.test(user.username))) {
+        suc = false;
         res.statusCode = 400;
         res.send("Problem with username, only letters allowed!");
     }
     if (!(user.password.match("^[A-z0-9]+$"))) {
+        suc = false;
         res.statusCode = 400;
         res.send("Problem with password, only letters and digits are allowed!");
     }
     var categoriesArray = user.categories.split(',');
     if (categoriesArray.length < 2) {
+        suc = false;
         res.statusCode = 400;
         res.send("Not enough categories specified !");
     }
@@ -43,12 +51,15 @@ function register(req, res) {
         if (!isNaN(parseInt(value)))
             categoriesIntList.push(parseInt(value));
         else {
+            suc = false;
             res.statusCode = 400;
             res.send("Category must be ID !");
         }
     });
 
     console.log("got this user: " + req.body.first_name);
+    if (!suc)
+        return;
     DButilsAzure.executeQuery("INSERT INTO Users (username,password,first_name,last_name,city,country,email) \n" +
         "VALUES ('" + user.username + "','" + user.password + "','" + user.first_name + "','" + user.last_name + "','" + user.city + "','" + user.country + "','" + user.email + "')")
         .then(function (result) {
