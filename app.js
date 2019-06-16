@@ -1,3 +1,6 @@
+const appInsights = require("applicationinsights");
+appInsights.setup("2bdf02b2-8738-404c-a9c1-ef479678ea7e");
+appInsights.start();
 var express = require('express');
 var app = express();
 const DButilsAzure = require('./DButils');
@@ -8,9 +11,7 @@ var cors = require('cors');
 app.use(cors());
 
 const port = process.env.PORT || 1337;
-const appInsights = require("applicationinsights");
-appInsights.setup("2bdf02b2-8738-404c-a9c1-ef479678ea7e");
-appInsights.start();
+
 
 //anael edit
 app.use("/", function (req, res, next) {
