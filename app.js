@@ -7,6 +7,8 @@ app.use(express.json()); //hels me read the JSON
 var cors = require('cors');
 app.use(cors());
 
+const port = 5000;
+
 
 //anael edit
 app.use("/", function (req, res, next) {
@@ -145,7 +147,7 @@ app.get("/getUserQuestion/:username", function (req, res) {
 });
 
 
-var server = app.listen(5000, function () {
+var server = app.listen(port, function () {
     console.log('Server is running..');
 });
 
