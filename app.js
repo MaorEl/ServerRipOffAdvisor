@@ -8,12 +8,14 @@ var cors = require('cors');
 app.use(cors());
 
 const port = process.env.PORT || 1337;
-
+const appInsights = require("applicationinsights");
+appInsights.setup("2bdf02b2-8738-404c-a9c1-ef479678ea7e");
+appInsights.start();
 
 //anael edit
 app.use("/", function (req, res, next) {
-    // res.setHeader('Access-Control-Allow-Origin', '*');
-    // res.setHeader('Access-Control-Allow-Headers', 'Content-Type,x-auth-token, Access-Control-Allow-Headers, X-Requested-With');
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type,x-auth-token, Access-Control-Allow-Headers, X-Requested-With');
     res.setHeader('Access-Control-Allow-Methods', 'POST,GET,PUT,DELETE, OPTIONS');
 
     next();
