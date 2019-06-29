@@ -7,7 +7,7 @@ app.use(express.json()); //hels me read the JSON
 var cors = require('cors');
 app.use(cors());
 
-const port = 5000;
+const port = 80;
 
 
 //anael edit
