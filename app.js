@@ -6,7 +6,7 @@ const user = require('./user');
 app.use(express.json()); //hels me read the JSON
 var cors = require('cors');
 app.use(cors());
-var port = 80 || 8080;
+var port =  8080;
 //var server_ip_address = process.env.OPENSHIFT_NODEJS_IP || '127.0.0.1';
 
 
