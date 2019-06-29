@@ -6,8 +6,9 @@ const user = require('./user');
 app.use(express.json()); //hels me read the JSON
 var cors = require('cors');
 app.use(cors());
+var port = process.env.OPENSHIFT_NODEJS_PORT || 8080;
+var server_ip_address = process.env.OPENSHIFT_NODEJS_IP || '127.0.0.1';
 
-const port = 80;
 
 
 //anael edit
@@ -147,8 +148,8 @@ app.get("/getUserQuestion/:username", function (req, res) {
 });
 
 
-var server = app.listen(port, function () {
-    console.log('Server is running..');
+var server = app.listen(port,server_ip_address, function () {
+    console.log('Server is running.. on ' + server_ip_address + ' and port ' + port);
 });
 
 
