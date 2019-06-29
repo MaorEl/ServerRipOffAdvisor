@@ -6,7 +6,7 @@ const user = require('./user');
 app.use(express.json()); //hels me read the JSON
 var cors = require('cors');
 app.use(cors());
-var port =  80;
+const port=process.env.PORT || 3000;
 var server_name = 'https://ripoffadvisorserver.azurewebsites.net';
 //var server_ip_address = process.env.OPENSHIFT_NODEJS_IP || '127.0.0.1';
 
